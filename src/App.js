@@ -1,6 +1,7 @@
 import './App.css';
 import Timer from './components/Timer/Timer';
 import TaskList from './components/TaskList/TaskList';
+import Progress from './components/Progress/Progress';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           
           <div className="tasklist-column">
             <TaskList />
+            <Progress />
           </div>
         </main>
       </div>
