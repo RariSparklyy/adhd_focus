@@ -3,6 +3,7 @@ import Timer from './components/Timer/Timer';
 import TaskList from './components/TaskList/TaskList';
 import Progress from './components/Progress/Progress';
 import DeadlineTracker from './components/Deadline/DeadlineTracker';
+import Reflection from './components/Reflection/Reflection';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           
           <div className="tasklist-column">
             <TaskList />
+            <Reflection />
             <Progress />
           </div>
         </main>
