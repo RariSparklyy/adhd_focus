@@ -150,17 +150,60 @@
   background: #d1d5db;
 }
 
-/* Motivation Box */
+/* Enhanced Motivation Box */
 .motivation-box {
   background: white;
   border-radius: 16px;
   padding: 20px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
 }
 
-.motivation-box p {
+.motivation-box.pulsing {
+  animation: pulse 2s infinite;
+  border-color: #9333ea;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(147, 51, 234, 0.4);
+  }
+}
+
+.motivation-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.motivation-text {
   color: #6b7280;
   font-size: 16px;
-  margin: 0;
+  margin: 0 0 10px 0;
+  font-weight: 500;
+}
+
+.progress-percentage-display {
+  display: inline-block;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: 8px;
 }

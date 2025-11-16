@@ -146,13 +146,25 @@ function Timer() {
         </div>
       </div>
 
-      {/* Motivational Message */}
-      <div className="motivation-box">
-        <p>
+      {/* Enhanced Motivational Message */}
+      <div className={`motivation-box ${isActive ? 'pulsing' : ''}`}>
+        <div className="motivation-icon">
+          {isActive ? '💪' : '👋'}
+        </div>
+        <p className="motivation-text">
           {isActive
-            ? '💪 You\'re doing great! Keep going!'
-            : '👋 Ready to start your focus session?'}
+            ? sessionType === 'focus' 
+              ? 'Stay focused! You\'re building momentum!' 
+              : 'Relax and recharge! You earned this break!'
+            : sessionType === 'focus'
+            ? 'Ready to crush your goals? Hit start!'
+            : 'Time for a well-deserved break!'}
         </p>
+        {isActive && (
+          <div className="progress-percentage-display">
+            {Math.round(progress)}% Complete
+          </div>
+        )}
       </div>
     </div>
   );
