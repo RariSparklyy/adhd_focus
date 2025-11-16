@@ -1,6 +1,168 @@
 .timer-container {
   max-width: 500px;
   margin: 0 auto;
+  position: relative;
+}
+
+/* Completion Overlay */
+.completion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: overlayFadeIn 0.4s ease;
+  backdrop-filter: blur(8px);
+}
+
+.completion-overlay.focus-complete {
+  background: rgba(147, 51, 234, 0.95);
+}
+
+.completion-overlay.break-complete {
+  background: rgba(22, 163, 74, 0.95);
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.completion-content {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 24px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: contentPopIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes contentPopIn {
+  from {
+    transform: scale(0.5) translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.completion-icon {
+  font-size: 6rem;
+  margin-bottom: 20px;
+  animation: iconBounce 0.8s ease infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(-10deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(10deg);
+  }
+}
+
+.completion-title {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 15px;
+  font-weight: 800;
+}
+
+.completion-message {
+  font-size: 1.2rem;
+  color: #6b7280;
+  margin-bottom: 30px;
+}
+
+.completion-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-badge {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  padding: 15px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #e9d5ff;
+}
+
+.badge-icon {
+  font-size: 1.5rem;
+}
+
+.badge-text {
+  font-weight: 700;
+  color: #7c3aed;
+  font-size: 1.1rem;
+}
+
+.completion-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.continue-btn,
+.break-btn,
+.focus-btn,
+.extend-btn {
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.continue-btn {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+}
+
+.continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+}
+
+.break-btn,
+.extend-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.break-btn:hover,
+.extend-btn:hover {
+  background: #e5e7eb;
+}
+
+.focus-btn {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+}
+
+.focus-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
 }
 
 /* Session Selector */
@@ -43,6 +205,22 @@
   padding: 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  transition: all 0.5s ease;
+}
+
+.timer-display.timer-complete {
+  animation: successPulse 1.5s ease infinite;
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 15px 50px rgba(16, 185, 129, 0.5);
+    transform: scale(1.02);
+  }
 }
 
 /* Progress Ring */
@@ -75,12 +253,31 @@
   font-weight: 700;
   color: #1f2937;
   line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.time-text.time-complete {
+  color: #10b981;
+  animation: textCelebrate 0.6s ease;
+}
+
+@keyframes textCelebrate {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+  }
 }
 
 .session-label {
   font-size: 0.9rem;
   color: #9ca3af;
   margin-top: 10px;
+  transition: all 0.3s ease;
 }
 
 /* Time Adjustments */
@@ -206,4 +403,24 @@
   font-weight: 700;
   font-size: 0.95rem;
   margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .completion-content {
+    padding: 40px 30px;
+    margin: 20px;
+  }
+  
+  .completion-title {
+    font-size: 2rem;
+  }
+  
+  .completion-icon {
+    font-size: 4rem;
+  }
+  
+  .completion-stats {
+    flex-direction: column;
+  }
 }

@@ -6,6 +6,8 @@ function Timer() {
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [sessionType, setSessionType] = useState('focus'); // 'focus' or 'break'
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [completionType, setCompletionType] = useState('');
 
   // Timer countdown logic
   useEffect(() => {
@@ -15,8 +17,9 @@ function Timer() {
       interval = setInterval(() => {
         if (seconds === 0) {
           if (minutes === 0) {
+            // Timer finished!
             setIsActive(false);
-            alert('Timer finished! 🎉');
+            handleTimerComplete();
           } else {
             setMinutes(minutes - 1);
             setSeconds(59);
@@ -30,6 +33,16 @@ function Timer() {
     return () => clearInterval(interval);
   }, [isActive, minutes, seconds]);
 
+  const handleTimerComplete = () => {
+    setCompletionType(sessionType);
+    setShowCompletion(true);
+    
+    // Hide completion message after 4 seconds
+    setTimeout(() => {
+      setShowCompletion(false);
+    }, 4000);
+  };
+
   const toggleTimer = () => {
     setIsActive(!isActive);
   };
@@ -42,6 +55,7 @@ function Timer() {
       setMinutes(5);
     }
     setSeconds(0);
+    setShowCompletion(false);
   };
 
   const switchSessionType = (type) => {
@@ -53,12 +67,23 @@ function Timer() {
       setMinutes(5);
     }
     setSeconds(0);
+    setShowCompletion(false);
   };
 
   const adjustTime = (amount) => {
     if (!isActive) {
       setMinutes(Math.max(1, minutes + amount));
     }
+  };
+
+  const continueWorking = () => {
+    setShowCompletion(false);
+    if (sessionType === 'focus') {
+      setMinutes(25);
+    } else {
+      setMinutes(5);
+    }
+    setSeconds(0);
   };
 
   // Calculate progress percentage
@@ -68,6 +93,57 @@ function Timer() {
 
   return (
     <div className="timer-container">
+      {/* Completion Overlay */}
+      {showCompletion && (
+        <div className={`completion-overlay ${completionType === 'focus' ? 'focus-complete' : 'break-complete'}`}>
+          <div className="completion-content">
+            {completionType === 'focus' ? (
+              <>
+                <div className="completion-icon">🎉</div>
+                <h2 className="completion-title">Amazing Work!</h2>
+                <p className="completion-message">
+                  You crushed that focus session! 💪
+                </p>
+                <div className="completion-stats">
+                  <div className="stat-badge">
+                    <span className="badge-icon">⭐</span>
+                    <span className="badge-text">+1 Session</span>
+                  </div>
+                  <div className="stat-badge">
+                    <span className="badge-icon">🔥</span>
+                    <span className="badge-text">Streak!</span>
+                  </div>
+                </div>
+                <div className="completion-actions">
+                  <button onClick={continueWorking} className="continue-btn">
+                    🚀 Keep the momentum!
+                  </button>
+                  <button onClick={() => switchSessionType('break')} className="break-btn">
+                    ☕ Take a break
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="completion-icon">✨</div>
+                <h2 className="completion-title">Break Complete!</h2>
+                <p className="completion-message">
+                  Feeling refreshed? Let's get back to it! 💚
+                </p>
+                <div className="completion-actions">
+                  <button onClick={() => switchSessionType('focus')} className="focus-btn">
+                    🎯 Start Focus Session
+                  </button>
+                  <button onClick={continueWorking} className="extend-btn">
+                    😌 Extend break
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Session Type Selector */}
       <div className="session-selector">
         <button
@@ -85,7 +161,7 @@ function Timer() {
       </div>
 
       {/* Timer Display */}
-      <div className="timer-display">
+      <div className={`timer-display ${minutes === 0 && seconds === 0 ? 'timer-complete' : ''}`}>
         {/* Progress Circle */}
         <div className="progress-ring">
           <svg width="280" height="280">
@@ -113,11 +189,17 @@ function Timer() {
           
           {/* Time Text */}
           <div className="time-display">
-            <div className="time-text">
+            <div className={`time-text ${minutes === 0 && seconds === 0 && !isActive ? 'time-complete' : ''}`}>
               {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
             <div className="session-label">
-              {sessionType === 'focus' ? 'Stay focused!' : 'Take a break'}
+              {minutes === 0 && seconds === 0 && !isActive
+                ? sessionType === 'focus' 
+                  ? '🎉 Session Complete!' 
+                  : '✨ Break Done!'
+                : sessionType === 'focus' 
+                ? 'Stay focused!' 
+                : 'Take a break'}
             </div>
           </div>
         </div>
