@@ -1,23 +1,26 @@
-import logo from './logo.svg';
 import './App.css';
+import Timer from './components/Timer/Timer';
+import TaskList from './components/TaskList/TaskList';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="app-container">
+        <header className="app-header">
+          <h1 className="app-title">🧠 ADHD Study Timer</h1>
+          <p className="app-subtitle">Your friendly focus companion</p>
+        </header>
+        
+        <main className="main-content">
+          <div className="timer-column">
+            <Timer />
+          </div>
+          
+          <div className="tasklist-column">
+            <TaskList />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

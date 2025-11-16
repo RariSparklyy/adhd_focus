@@ -1,0 +1,166 @@
+.timer-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Session Selector */
+.session-selector {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.session-btn {
+  flex: 1;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: white;
+  color: #6b7280;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.session-btn:hover {
+  background: #f9fafb;
+}
+
+.session-btn.active-focus {
+  background: #9333ea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+.session-btn.active-break {
+  background: #16a34a;
+  color: white;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* Timer Display */
+.timer-display {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Progress Ring */
+.progress-ring {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto 30px;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+}
+
+.progress-circle {
+  transition: stroke-dashoffset 1s linear;
+}
+
+/* Time Display */
+.time-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.time-text {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.session-label {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-top: 10px;
+}
+
+/* Time Adjustments */
+.time-adjustments {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.adjust-btn {
+  padding: 10px 20px;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.adjust-btn:hover {
+  background: #e5e7eb;
+}
+
+/* Control Buttons */
+.control-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.start-btn {
+  flex: 1;
+  padding: 18px 30px;
+  border-radius: 14px;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.start-btn.focus-mode {
+  background: #9333ea;
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+}
+
+.start-btn.break-mode {
+  background: #16a34a;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+}
+
+.start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.5);
+}
+
+.pause-btn {
+  background: #ef4444 !important;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+}
+
+.reset-btn {
+  padding: 18px 30px;
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 14px;
+  font-size: 18px;
+}
+
+.reset-btn:hover {
+  background: #d1d5db;
+}
+
+/* Motivation Box */
+.motivation-box {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.motivation-box p {
+  color: #6b7280;
+  font-size: 16px;
+  margin: 0;
+}
