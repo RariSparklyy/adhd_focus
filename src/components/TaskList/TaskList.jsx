@@ -5,6 +5,8 @@ function TaskList() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [currentTask, setCurrentTask] = useState(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [selectedColor, setSelectedColor] = useState('purple');
 
   // Add a new task
   const addTask = () => {
@@ -15,7 +17,8 @@ function TaskList() {
       text: newTask,
       completed: false,
       createdAt: new Date().toLocaleString(),
-      aiBreakdown: null // Placeholder for AI feature later
+      aiBreakdown: null,
+      color: selectedColor
     };
     
     setTasks([...tasks, task]);
@@ -31,6 +34,14 @@ function TaskList() {
 
   // Toggle task completion
   const toggleTask = (id) => {
+    const task = tasks.find(t => t.id === id);
+    
+    // If completing a task, show celebration
+    if (!task.completed) {
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 2000);
+    }
+    
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
@@ -63,6 +74,16 @@ function TaskList() {
         </p>
       </div>
 
+      {/* Celebration Overlay */}
+      {showCelebration && (
+        <div className="celebration-overlay">
+          <div className="celebration-content">
+            <div className="celebration-emoji">🎉</div>
+            <div className="celebration-text">Great job!</div>
+          </div>
+        </div>
+      )}
+
       {/* Current Task Display */}
       {currentTask && (
         <div className="current-task-banner">
@@ -73,14 +94,26 @@ function TaskList() {
 
       {/* Add Task Input */}
       <div className="add-task-section">
-        <input
-          type="text"
-          placeholder="What do you need to focus on? 🚀"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="task-input"
-        />
+        <div className="input-with-colors">
+          <input
+            type="text"
+            placeholder="What do you need to focus on? 🚀"
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="task-input"
+          />
+          <div className="color-picker">
+            {['purple', 'blue', 'green', 'orange', 'pink'].map(color => (
+              <button
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                className={`color-btn color-${color} ${selectedColor === color ? 'selected' : ''}`}
+                title={color}
+              />
+            ))}
+          </div>
+        </div>
         <button onClick={addTask} className="add-task-btn">
           ➕ Add Task
         </button>
@@ -97,7 +130,7 @@ function TaskList() {
           tasks.map(task => (
             <div 
               key={task.id} 
-              className={`task-item ${task.completed ? 'completed' : ''} ${currentTask?.id === task.id ? 'current' : ''}`}
+              className={`task-item task-color-${task.color} ${task.completed ? 'completed' : ''} ${currentTask?.id === task.id ? 'current' : ''}`}
             >
               <div className="task-main">
                 <input
@@ -142,18 +175,46 @@ function TaskList() {
         )}
       </div>
 
-      {/* Task Summary */}
+      {/* Visual Progress Summary */}
       {tasks.length > 0 && (
-        <div className="task-summary">
-          <div className="summary-item">
-            <span className="summary-label">Total Tasks:</span>
-            <span className="summary-value">{tasks.length}</span>
+        <div className="visual-progress-section">
+          <h3>📈 Your Progress</h3>
+          
+          {/* Overall Progress Bar */}
+          <div className="progress-bar-container">
+            <div className="progress-bar-label">
+              <span>Overall Completion</span>
+              <span className="progress-percentage">
+                {Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100)}%
+              </span>
+            </div>
+            <div className="progress-bar-track">
+              <div 
+                className="progress-bar-fill"
+                style={{ 
+                  width: `${(tasks.filter(t => t.completed).length / tasks.length) * 100}%` 
+                }}
+              />
+            </div>
           </div>
-          <div className="summary-item">
-            <span className="summary-label">Progress:</span>
-            <span className="summary-value">
-              {tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0}%
-            </span>
+
+          {/* Stats with Icons */}
+          <div className="stats-mini-grid">
+            <div className="stat-mini">
+              <div className="stat-mini-icon">📋</div>
+              <div className="stat-mini-value">{tasks.length}</div>
+              <div className="stat-mini-label">Total</div>
+            </div>
+            <div className="stat-mini">
+              <div className="stat-mini-icon">✅</div>
+              <div className="stat-mini-value">{tasks.filter(t => t.completed).length}</div>
+              <div className="stat-mini-label">Done</div>
+            </div>
+            <div className="stat-mini">
+              <div className="stat-mini-icon">⏳</div>
+              <div className="stat-mini-value">{tasks.filter(t => !t.completed).length}</div>
+              <div className="stat-mini-label">Active</div>
+            </div>
           </div>
         </div>
       )}

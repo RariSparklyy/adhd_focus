@@ -2,6 +2,7 @@ import './App.css';
 import Timer from './components/Timer/Timer';
 import TaskList from './components/TaskList/TaskList';
 import Progress from './components/Progress/Progress';
+import DeadlineTracker from './components/Deadline/DeadlineTracker';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <main className="main-content">
           <div className="timer-column">
             <Timer />
+            <DeadlineTracker />
           </div>
           
           <div className="tasklist-column">
