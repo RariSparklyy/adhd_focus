@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Reflection.css';
+import { generateReflectionInsights, generatePatternInsights, testOllamaConnection } from '../../services/aiService';
 
 function Reflection() {
   const [reflections, setReflections] = useState([]);
@@ -18,6 +19,8 @@ function Reflection() {
     totalMinutes: 0,
     currentStreak: 0
   });
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [ollamaStatus, setOllamaStatus] = useState(null);
 
   // Load reflections and session history
   const loadData = () => {
@@ -57,15 +60,26 @@ function Reflection() {
     localStorage.setItem('adhd-reflections', JSON.stringify(reflections));
   }, [reflections]);
 
+  // Check Ollama connection on mount
+  useEffect(() => {
+    const checkOllama = async () => {
+      console.log('Checking Ollama connection...');
+      const status = await testOllamaConnection();
+      console.log('Ollama Status:', status);
+      setOllamaStatus(status);
+    };
+    checkOllama();
+  }, []);
+
   const addReflection = () => {
     const reflection = {
       id: Date.now(),
       ...newReflection,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString(),
-      aiSummary: null, // Placeholder for AI feature
-      aiInsights: null,  // Placeholder for AI feature
-      sessionsAtTime: sessionHistory.length, // Track how many sessions when reflection was made
+      aiSummary: null,
+      aiInsights: null,
+      sessionsAtTime: sessionHistory.length,
       totalMinutesAtTime: stats.totalMinutes
     };
 
@@ -86,21 +100,122 @@ function Reflection() {
     }
   };
 
-  const generateAISummary = (id) => {
-    // Placeholder for AI feature
-    const reflection = reflections.find(r => r.id === id);
-    const recentSessions = sessionHistory.slice(0, 10);
+  const generateAISummary = async (id) => {
+    console.log('=== Generate AI Summary Called ===');
+    console.log('Reflection ID:', id);
+    console.log('Ollama Status:', ollamaStatus);
     
-    alert(
-      `AI Summary Generation (Coming Soon!) 🤖\n\n` +
-      `This will analyze:\n` +
-      `• Your mood: ${reflection.mood}\n` +
-      `• Productivity level: ${reflection.productivity}/10\n` +
-      `• Recent ${recentSessions.length} sessions\n` +
-      `• Total time: ${stats.totalMinutes} minutes\n` +
-      `• Wins, challenges, and notes\n\n` +
-      `To generate personalized insights and patterns!`
-    );
+    const reflection = reflections.find(r => r.id === id);
+    console.log('Found Reflection:', reflection);
+    
+    if (!reflection) {
+      console.error('Reflection not found!');
+      return;
+    }
+
+    // Check Ollama status first
+    if (!ollamaStatus?.connected) {
+      alert(
+        '❌ Ollama Not Connected\n\n' +
+        'Please make sure:\n' +
+        '1. Ollama is installed\n' +
+        '2. Ollama is running (check http://localhost:11434)\n' +
+        '3. The model "llama3.2" is downloaded\n\n' +
+        'Then refresh the page and try again.'
+      );
+      return;
+    }
+
+    if (!ollamaStatus?.hasModel) {
+      alert(
+        '❌ Model Not Found\n\n' +
+        'Please download the model by running:\n' +
+        'ollama pull llama3.2\n\n' +
+        'Then refresh the page and try again.'
+      );
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    console.log('Starting AI generation...');
+
+    try {
+      // Generate AI insights
+      console.log('Calling generateReflectionInsights...');
+      const result = await generateReflectionInsights(reflection, sessionHistory);
+      console.log('AI Result:', result);
+
+      if (result.success) {
+        // Update the reflection with AI summary
+        const updatedReflections = reflections.map(r => 
+          r.id === id ? { ...r, aiSummary: result.summary } : r
+        );
+        setReflections(updatedReflections);
+
+        alert('✅ AI Summary Generated!\n\nCheck your reflection below.');
+      } else {
+        alert(
+          '❌ AI Generation Failed\n\n' +
+          `Error: ${result.error}\n\n` +
+          'Make sure Ollama is running at http://localhost:11434'
+        );
+      }
+    } catch (error) {
+      console.error('AI Generation Error:', error);
+      alert(
+        '❌ Unexpected Error\n\n' +
+        `${error.message}\n\n` +
+        'Please check the console for details.'
+      );
+    } finally {
+      setIsGeneratingAI(false);
+      console.log('AI generation complete');
+    }
+  };
+
+  const generatePatternAnalysis = async () => {
+    console.log('=== Generate Pattern Analysis Called ===');
+    
+    if (reflections.length === 0) {
+      alert('No reflections yet! Add some reflections first.');
+      return;
+    }
+
+    // Check Ollama status
+    if (!ollamaStatus?.connected) {
+      alert(
+        '❌ Ollama Not Connected\n\n' +
+        'Please make sure Ollama is running.\n' +
+        'Check: http://localhost:11434'
+      );
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    console.log('Starting pattern analysis...');
+
+    try {
+      const result = await generatePatternInsights(reflections, sessionHistory);
+      console.log('Pattern Analysis Result:', result);
+
+      if (result.success) {
+        alert(
+          '🤖 AI Pattern Analysis\n\n' +
+          result.insights
+        );
+      } else {
+        alert(
+          '❌ AI Generation Failed\n\n' +
+          `Error: ${result.error}`
+        );
+      }
+    } catch (error) {
+      console.error('Pattern Analysis Error:', error);
+      alert('❌ Unexpected Error\n\n' + error.message);
+    } finally {
+      setIsGeneratingAI(false);
+      console.log('Pattern analysis complete');
+    }
   };
 
   const getMoodEmoji = (mood) => {
@@ -146,6 +261,18 @@ function Reflection() {
           {showAddForm ? '✕ Cancel' : '➕ New Reflection'}
         </button>
       </div>
+
+      {/* Ollama Status Indicator */}
+      {ollamaStatus && (
+        <div className={`ollama-status ${ollamaStatus.connected ? 'connected' : 'disconnected'}`}>
+          <span className="status-icon">{ollamaStatus.connected ? '🟢' : '🔴'}</span>
+          <span className="status-text">
+            {ollamaStatus.connected 
+              ? `AI Ready (${ollamaStatus.hasModel ? 'Model loaded' : 'Model missing'})` 
+              : 'AI Offline - Start Ollama to enable'}
+          </span>
+        </div>
+      )}
 
       {/* Add Reflection Form */}
       {showAddForm && (
@@ -307,10 +434,18 @@ function Reflection() {
           <div className="ai-icon">🤖</div>
           <div className="ai-text">
             <strong>AI Pattern Analysis Available!</strong>
-            <p>Generate insights from your {sessionHistory.length} sessions and reflections to understand your productivity patterns.</p>
+            <p>
+              {ollamaStatus?.connected 
+                ? `Generate insights from your ${sessionHistory.length} sessions and ${reflections.length} reflections.`
+                : '⚠️ Ollama not connected. Start Ollama to enable AI features.'}
+            </p>
           </div>
-          <button className="generate-insights-btn" onClick={() => generateAISummary()}>
-            Generate AI Insights
+          <button 
+            className="generate-insights-btn" 
+            onClick={generatePatternAnalysis}
+            disabled={isGeneratingAI || !ollamaStatus?.connected}
+          >
+            {isGeneratingAI ? '⏳ Generating...' : 'Generate AI Insights'}
           </button>
         </div>
       )}
@@ -399,7 +534,7 @@ function Reflection() {
                   </div>
                 )}
 
-                {/* AI Summary Placeholder */}
+                {/* AI Summary Section */}
                 <div className="ai-summary-section">
                   <div className="ai-summary-header">
                     <span className="ai-icon-small">🤖</span>
@@ -413,8 +548,9 @@ function Reflection() {
                       <button 
                         onClick={() => generateAISummary(reflection.id)}
                         className="generate-summary-btn"
+                        disabled={isGeneratingAI || !ollamaStatus?.connected}
                       >
-                        Generate Summary
+                        {isGeneratingAI ? '⏳ Generating...' : 'Generate Summary'}
                       </button>
                     </div>
                   )}
@@ -425,8 +561,9 @@ function Reflection() {
                   <button 
                     onClick={() => generateAISummary(reflection.id)}
                     className="action-btn-secondary"
+                    disabled={isGeneratingAI || !ollamaStatus?.connected}
                   >
-                    🤖 AI Insights
+                    {isGeneratingAI ? '⏳ Generating...' : '🤖 AI Insights'}
                   </button>
                   <button 
                     onClick={() => deleteReflection(reflection.id)}

@@ -39,6 +39,34 @@
   background: #7c3aed;
 }
 
+/* Ollama Status Indicator */
+.ollama-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ollama-status.connected {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  color: #166534;
+}
+
+.ollama-status.disconnected {
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  color: #991b1b;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
 /* Reflection Form */
 .reflection-form {
   background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
@@ -662,6 +690,7 @@
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 .ai-summary-placeholder-box {
@@ -716,6 +745,21 @@
 
 .action-btn-danger:hover {
   background: #dc2626;
+}
+
+/* AI Generation Loading State */
+.generate-insights-btn:disabled,
+.generate-summary-btn:disabled,
+.action-btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.generate-insights-btn:disabled:hover,
+.generate-summary-btn:disabled:hover,
+.action-btn-secondary:disabled:hover {
+  transform: none !important;
 }
 
 /* Responsive */
