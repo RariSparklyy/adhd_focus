@@ -356,41 +356,29 @@ Now break down the task:`;
 /**
  * Create prompt for comprehensive insights
  */
+/**
+ * Create prompt for comprehensive insights
+ */
 const createComprehensivePrompt = (context) => {
-  return `You are an ADHD-focused productivity coach. Analyze this student's complete productivity data and provide personalized insights.
+  return `You are an ADHD-focused productivity coach. Analyze this student's productivity data and provide a brief, actionable update.
 
-**Overall Activity:**
-- Total focus sessions: ${context.totalFocusSessions}
-- Total focus time: ${context.totalFocusMinutes} minutes
+**Current Data:**
+- Focus sessions: ${context.totalFocusSessions} (${context.totalFocusMinutes} min)
 - Break sessions: ${context.totalBreakSessions}
-- Current streak: ${context.currentStreak}
+- Streak: ${context.currentStreak} sessions
+- Tasks: ${context.activeTasks} active, ${context.completedTasks} completed (${context.completionRate}% done)
+- Deadlines: ${context.upcomingDeadlines} upcoming, ${context.overdueItems} overdue
+- Recent mood: ${context.averageMood}
+- Productivity: ${context.averageProductivity}/10
 
-**Tasks:**
-- Active tasks: ${context.activeTasks}
-- Completed tasks: ${context.completedTasks}
-- Task completion rate: ${context.completionRate}%
+Provide a short update (2-3 sentences) that:
+1. Highlights ONE specific achievement or pattern
+2. Gives ONE practical tip or encouragement
+3. Stays positive and ADHD-friendly
 
-**Deadlines:**
-- Upcoming deadlines: ${context.upcomingDeadlines}
-- Overdue items: ${context.overdueItems}
-
-**Recent Reflections:**
-- Average mood: ${context.averageMood}
-- Average productivity: ${context.averageProductivity}/10
-- Common challenges: ${context.commonChallenges}
-
-**Recent Activity Pattern:**
-${context.recentActivitySummary}
-
-Provide encouraging, actionable insights (5-6 sentences) that:
-1. Celebrate their progress and wins
-2. Identify productivity patterns (good and areas for improvement)
-3. Address time management and deadline awareness
-4. Suggest 2-3 specific ADHD-friendly strategies
-5. Offer motivation and next steps
-
-Be warm, supportive, and practical. Focus on sustainable habits and self-compassion.`;
+Keep it brief, specific, and actionable. No generic advice.`;
 };
+
 
 /**
  * Prepare comprehensive context from all app data
