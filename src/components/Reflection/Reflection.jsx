@@ -11,13 +11,45 @@ function Reflection() {
     challenges: '',
     wins: ''
   });
+  const [sessionHistory, setSessionHistory] = useState([]);
+  const [stats, setStats] = useState({
+    todaySessions: 0,
+    weekSessions: 0,
+    totalMinutes: 0,
+    currentStreak: 0
+  });
 
-  // Load reflections from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('adhd-reflections');
-    if (saved) {
-      setReflections(JSON.parse(saved));
+  // Load reflections and session history
+  const loadData = () => {
+    const savedReflections = localStorage.getItem('adhd-reflections');
+    if (savedReflections) {
+      setReflections(JSON.parse(savedReflections));
     }
+
+    const savedHistory = localStorage.getItem('adhd-timer-history');
+    if (savedHistory) {
+      setSessionHistory(JSON.parse(savedHistory));
+    }
+
+    const savedStats = localStorage.getItem('adhd-timer-stats');
+    if (savedStats) {
+      setStats(JSON.parse(savedStats));
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+
+    // Listen for session completion events from Timer
+    const handleSessionCompleted = () => {
+      loadData();
+    };
+
+    window.addEventListener('sessionCompleted', handleSessionCompleted);
+
+    return () => {
+      window.removeEventListener('sessionCompleted', handleSessionCompleted);
+    };
   }, []);
 
   // Save to localStorage whenever reflections change
@@ -32,7 +64,9 @@ function Reflection() {
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString(),
       aiSummary: null, // Placeholder for AI feature
-      aiInsights: null  // Placeholder for AI feature
+      aiInsights: null,  // Placeholder for AI feature
+      sessionsAtTime: sessionHistory.length, // Track how many sessions when reflection was made
+      totalMinutesAtTime: stats.totalMinutes
     };
 
     setReflections([reflection, ...reflections]);
@@ -54,7 +88,19 @@ function Reflection() {
 
   const generateAISummary = (id) => {
     // Placeholder for AI feature
-    alert('AI Summary Generation will be added later! 🤖\n\nThis will analyze your reflection and generate insights about:\n• Productivity patterns\n• Common challenges\n• Suggested improvements\n• Motivational feedback');
+    const reflection = reflections.find(r => r.id === id);
+    const recentSessions = sessionHistory.slice(0, 10);
+    
+    alert(
+      `AI Summary Generation (Coming Soon!) 🤖\n\n` +
+      `This will analyze:\n` +
+      `• Your mood: ${reflection.mood}\n` +
+      `• Productivity level: ${reflection.productivity}/10\n` +
+      `• Recent ${recentSessions.length} sessions\n` +
+      `• Total time: ${stats.totalMinutes} minutes\n` +
+      `• Wins, challenges, and notes\n\n` +
+      `To generate personalized insights and patterns!`
+    );
   };
 
   const getMoodEmoji = (mood) => {
@@ -79,12 +125,19 @@ function Reflection() {
     return colors[mood] || '#6b7280';
   };
 
+  // Calculate session breakdown
+  const focusSessions = sessionHistory.filter(s => s.type === 'focus').length;
+  const breakSessions = sessionHistory.filter(s => s.type === 'break').length;
+  const totalFocusMinutes = sessionHistory
+    .filter(s => s.type === 'focus')
+    .reduce((sum, s) => sum + s.duration, 0);
+
   return (
     <div className="reflection-container">
       <div className="reflection-header">
         <div className="header-content">
-          <h2>📔 Daily Reflections</h2>
-          <p className="header-subtitle">Track your progress and generate AI insights</p>
+          <h2>📔 Reflections & Session History</h2>
+          <p className="header-subtitle">Track your journey and generate AI insights</p>
         </div>
         <button 
           onClick={() => setShowAddForm(!showAddForm)}
@@ -184,157 +237,207 @@ function Reflection() {
         </div>
       )}
 
-      {/* Weekly Summary Stats */}
-      {reflections.length > 0 && (
-        <div className="weekly-summary">
-          <h3>📊 This Week's Overview</h3>
-          <div className="summary-stats">
-            <div className="summary-stat">
-              <div className="stat-icon-large">📝</div>
-              <div className="stat-value-large">{reflections.length}</div>
-              <div className="stat-label-small">Total Reflections</div>
+      {/* Session Overview Stats */}
+      {sessionHistory.length > 0 && (
+        <div className="session-overview">
+          <h3>📊 Session Overview</h3>
+          <div className="overview-grid">
+            <div className="overview-card">
+              <div className="overview-icon">🔥</div>
+              <div className="overview-value">{stats.currentStreak}</div>
+              <div className="overview-label">Streak</div>
             </div>
-            <div className="summary-stat">
-              <div className="stat-icon-large">⭐</div>
-              <div className="stat-value-large">
-                {reflections.length > 0 
-                  ? (reflections.reduce((sum, r) => sum + r.productivity, 0) / reflections.length).toFixed(1)
-                  : 0}
-              </div>
-              <div className="stat-label-small">Avg Productivity</div>
+            <div className="overview-card">
+              <div className="overview-icon">🎯</div>
+              <div className="overview-value">{focusSessions}</div>
+              <div className="overview-label">Focus Sessions</div>
             </div>
-            <div className="summary-stat">
-              <div className="stat-icon-large">😊</div>
-              <div className="stat-value-large">
-                {getMoodEmoji(reflections[0]?.mood)}
-              </div>
-              <div className="stat-label-small">Latest Mood</div>
+            <div className="overview-card">
+              <div className="overview-icon">☕</div>
+              <div className="overview-value">{breakSessions}</div>
+              <div className="overview-label">Break Sessions</div>
             </div>
-          </div>
-
-          {/* AI Insights Placeholder */}
-          <div className="ai-insights-placeholder">
-            <div className="ai-icon">🤖</div>
-            <div className="ai-text">
-              <strong>AI Insights Coming Soon!</strong>
-              <p>Your reflections will be analyzed to provide personalized productivity insights and patterns.</p>
+            <div className="overview-card">
+              <div className="overview-icon">⏱️</div>
+              <div className="overview-value">{totalFocusMinutes}</div>
+              <div className="overview-label">Focus Minutes</div>
             </div>
-            <button className="generate-insights-btn" onClick={() => generateAISummary()}>
-              Generate AI Insights
-            </button>
           </div>
         </div>
       )}
 
+      {/* Recent Sessions History */}
+      <div className="session-history-section">
+        <h3>📝 Recent Sessions</h3>
+        {sessionHistory.length === 0 ? (
+          <div className="empty-sessions">
+            <div className="empty-icon">📭</div>
+            <p>No sessions yet!</p>
+            <p className="empty-subtext">Complete a focus or break session to see it here</p>
+          </div>
+        ) : (
+          <div className="sessions-list">
+            {sessionHistory.slice(0, 15).map(session => (
+              <div key={session.id} className={`session-item ${session.type}-session`}>
+                <div className="session-icon-circle">
+                  {session.type === 'focus' ? '🎯' : '☕'}
+                </div>
+                <div className="session-details">
+                  <div className="session-type">
+                    {session.type === 'focus' ? 'Focus Session' : 'Break Session'}
+                  </div>
+                  <div className="session-meta">
+                    <span className="session-duration">{session.duration} min</span>
+                    <span className="session-dot">•</span>
+                    <span className="session-time">{session.completedAt}</span>
+                  </div>
+                </div>
+                <div className="session-badge">
+                  ✓
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* AI Insights Placeholder */}
+      {sessionHistory.length > 0 && (
+        <div className="ai-insights-placeholder">
+          <div className="ai-icon">🤖</div>
+          <div className="ai-text">
+            <strong>AI Pattern Analysis Available!</strong>
+            <p>Generate insights from your {sessionHistory.length} sessions and reflections to understand your productivity patterns.</p>
+          </div>
+          <button className="generate-insights-btn" onClick={() => generateAISummary()}>
+            Generate AI Insights
+          </button>
+        </div>
+      )}
+
       {/* Reflections List */}
-      <div className="reflections-list">
+      <div className="reflections-section">
+        <h3>💭 Your Reflections</h3>
         {reflections.length === 0 ? (
           <div className="empty-reflections">
             <div className="empty-icon">📔</div>
             <p>No reflections yet!</p>
-            <p className="empty-subtext">Start tracking your journey to build better habits</p>
+            <p className="empty-subtext">Add a reflection to track your progress and mindset</p>
           </div>
         ) : (
-          reflections.map(reflection => (
-            <div key={reflection.id} className="reflection-card">
-              {/* Header */}
-              <div className="reflection-card-header">
-                <div className="reflection-date-time">
-                  <span className="reflection-date">{reflection.date}</span>
-                  <span className="reflection-time">{reflection.time}</span>
-                </div>
-                <div 
-                  className="reflection-mood-badge"
-                  style={{ backgroundColor: getMoodColor(reflection.mood) }}
-                >
-                  {getMoodEmoji(reflection.mood)}
-                </div>
-              </div>
-
-              {/* Productivity Bar */}
-              <div className="productivity-display">
-                <span className="productivity-label">Productivity</span>
-                <div className="productivity-bar-container">
+          <div className="reflections-list">
+            {reflections.map(reflection => (
+              <div key={reflection.id} className="reflection-card">
+                {/* Header */}
+                <div className="reflection-card-header">
+                  <div className="reflection-date-time">
+                    <span className="reflection-date">{reflection.date}</span>
+                    <span className="reflection-time">{reflection.time}</span>
+                  </div>
                   <div 
-                    className="productivity-bar-fill"
-                    style={{ 
-                      width: `${reflection.productivity * 10}%`,
-                      backgroundColor: reflection.productivity >= 7 ? '#10b981' : reflection.productivity >= 4 ? '#f59e0b' : '#ef4444'
-                    }}
-                  />
-                </div>
-                <span className="productivity-value">{reflection.productivity}/10</span>
-              </div>
-
-              {/* Content Sections */}
-              {reflection.wins && (
-                <div className="reflection-section wins-section">
-                  <div className="section-header">
-                    <span className="section-icon">🎉</span>
-                    <span className="section-title">Wins</span>
+                    className="reflection-mood-badge"
+                    style={{ backgroundColor: getMoodColor(reflection.mood) }}
+                  >
+                    {getMoodEmoji(reflection.mood)}
                   </div>
-                  <p className="section-content">{reflection.wins}</p>
                 </div>
-              )}
 
-              {reflection.challenges && (
-                <div className="reflection-section challenges-section">
-                  <div className="section-header">
-                    <span className="section-icon">💪</span>
-                    <span className="section-title">Challenges</span>
+                {/* Session Context */}
+                <div className="reflection-context">
+                  <span className="context-item">
+                    📊 {reflection.sessionsAtTime} sessions completed
+                  </span>
+                  <span className="context-dot">•</span>
+                  <span className="context-item">
+                    ⏱️ {reflection.totalMinutesAtTime} total minutes
+                  </span>
+                </div>
+
+                {/* Productivity Bar */}
+                <div className="productivity-display">
+                  <span className="productivity-label">Productivity</span>
+                  <div className="productivity-bar-container">
+                    <div 
+                      className="productivity-bar-fill"
+                      style={{ 
+                        width: `${reflection.productivity * 10}%`,
+                        backgroundColor: reflection.productivity >= 7 ? '#10b981' : reflection.productivity >= 4 ? '#f59e0b' : '#ef4444'
+                      }}
+                    />
                   </div>
-                  <p className="section-content">{reflection.challenges}</p>
+                  <span className="productivity-value">{reflection.productivity}/10</span>
                 </div>
-              )}
 
-              {reflection.notes && (
-                <div className="reflection-section notes-section">
-                  <div className="section-header">
-                    <span className="section-icon">📝</span>
-                    <span className="section-title">Notes</span>
-                  </div>
-                  <p className="section-content">{reflection.notes}</p>
-                </div>
-              )}
-
-              {/* AI Summary Placeholder */}
-              <div className="ai-summary-section">
-                <div className="ai-summary-header">
-                  <span className="ai-icon-small">🤖</span>
-                  <span>AI Summary</span>
-                </div>
-                {reflection.aiSummary ? (
-                  <p className="ai-summary-content">{reflection.aiSummary}</p>
-                ) : (
-                  <div className="ai-summary-placeholder-box">
-                    <p>AI analysis not generated yet</p>
-                    <button 
-                      onClick={() => generateAISummary(reflection.id)}
-                      className="generate-summary-btn"
-                    >
-                      Generate Summary
-                    </button>
+                {/* Content Sections */}
+                {reflection.wins && (
+                  <div className="reflection-section wins-section">
+                    <div className="section-header">
+                      <span className="section-icon">🎉</span>
+                      <span className="section-title">Wins</span>
+                    </div>
+                    <p className="section-content">{reflection.wins}</p>
                   </div>
                 )}
-              </div>
 
-              {/* Actions */}
-              <div className="reflection-actions">
-                <button 
-                  onClick={() => generateAISummary(reflection.id)}
-                  className="action-btn-secondary"
-                >
-                  🤖 AI Insights
-                </button>
-                <button 
-                  onClick={() => deleteReflection(reflection.id)}
-                  className="action-btn-danger"
-                >
-                  🗑️ Delete
-                </button>
+                {reflection.challenges && (
+                  <div className="reflection-section challenges-section">
+                    <div className="section-header">
+                      <span className="section-icon">💪</span>
+                      <span className="section-title">Challenges</span>
+                    </div>
+                    <p className="section-content">{reflection.challenges}</p>
+                  </div>
+                )}
+
+                {reflection.notes && (
+                  <div className="reflection-section notes-section">
+                    <div className="section-header">
+                      <span className="section-icon">📝</span>
+                      <span className="section-title">Notes</span>
+                    </div>
+                    <p className="section-content">{reflection.notes}</p>
+                  </div>
+                )}
+
+                {/* AI Summary Placeholder */}
+                <div className="ai-summary-section">
+                  <div className="ai-summary-header">
+                    <span className="ai-icon-small">🤖</span>
+                    <span>AI Summary</span>
+                  </div>
+                  {reflection.aiSummary ? (
+                    <p className="ai-summary-content">{reflection.aiSummary}</p>
+                  ) : (
+                    <div className="ai-summary-placeholder-box">
+                      <p>AI analysis not generated yet</p>
+                      <button 
+                        onClick={() => generateAISummary(reflection.id)}
+                        className="generate-summary-btn"
+                      >
+                        Generate Summary
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="reflection-actions">
+                  <button 
+                    onClick={() => generateAISummary(reflection.id)}
+                    className="action-btn-secondary"
+                  >
+                    🤖 AI Insights
+                  </button>
+                  <button 
+                    onClick={() => deleteReflection(reflection.id)}
+                    className="action-btn-danger"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -71,26 +71,82 @@
   color: #6b7280;
 }
 
-/* Test Section */
-.test-section {
-  text-align: center;
+/* Session Breakdown */
+.session-breakdown {
   margin-bottom: 30px;
-  padding: 20px;
-  background: #fef3c7;
-  border-radius: 12px;
-  border: 2px dashed #f59e0b;
 }
 
-.mock-session-btn {
-  padding: 12px 24px;
-  background: #f59e0b;
-  color: white;
-  border-radius: 10px;
-  font-size: 15px;
+.session-breakdown h3 {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin-bottom: 20px;
 }
 
-.mock-session-btn:hover {
-  background: #d97706;
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.breakdown-card {
+  border-radius: 16px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+
+.breakdown-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.focus-card {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border-color: #e9d5ff;
+}
+
+.focus-card:hover {
+  border-color: #9333ea;
+}
+
+.break-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #bbf7d0;
+}
+
+.break-card:hover {
+  border-color: #16a34a;
+}
+
+.breakdown-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.breakdown-stats {
+  flex: 1;
+}
+
+.breakdown-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 5px;
+}
+
+.breakdown-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.breakdown-time {
+  font-size: 0.85rem;
+  color: #9ca3af;
 }
 
 /* Session History */
@@ -133,8 +189,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.history-item.focus-session {
+  border-left: 5px solid #9333ea;
+  background: linear-gradient(90deg, #faf5ff 0%, #f9fafb 100%);
+}
+
+.history-item.break-session {
+  border-left: 5px solid #16a34a;
+  background: linear-gradient(90deg, #f0fdf4 0%, #f9fafb 100%);
+}
+
 .history-icon {
   font-size: 2rem;
+  flex-shrink: 0;
 }
 
 .history-content {
@@ -164,6 +231,7 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 /* Responsive */
@@ -176,5 +244,9 @@
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
+  }
+  
+  .breakdown-grid {
+    grid-template-columns: 1fr;
   }
 }

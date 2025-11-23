@@ -8,6 +8,7 @@ function Timer() {
   const [sessionType, setSessionType] = useState('focus'); // 'focus' or 'break'
   const [showCompletion, setShowCompletion] = useState(false);
   const [completionType, setCompletionType] = useState('');
+  const [sessionDuration, setSessionDuration] = useState(25); // Track original duration
 
   // Timer countdown logic
   useEffect(() => {
@@ -37,13 +38,69 @@ function Timer() {
     setCompletionType(sessionType);
     setShowCompletion(true);
     
-    // Hide completion message after 4 seconds
+    // Save session to localStorage for Progress component
+    saveSessionToHistory(sessionType, sessionDuration);
+    
+    // Hide completion message after 4 seconds and reset timer
     setTimeout(() => {
       setShowCompletion(false);
+      // Auto-reset to default time for next session
+      if (sessionType === 'focus') {
+        setMinutes(25);
+        setSessionDuration(25);
+      } else {
+        setMinutes(5);
+        setSessionDuration(5);
+      }
+      setSeconds(0);
     }, 4000);
   };
 
+  const saveSessionToHistory = (type, duration) => {
+    // Get existing stats
+    const savedStats = localStorage.getItem('adhd-timer-stats');
+    const stats = savedStats ? JSON.parse(savedStats) : {
+      todaySessions: 0,
+      weekSessions: 0,
+      totalMinutes: 0,
+      currentStreak: 0
+    };
+
+    // Update stats
+    const newStats = {
+      ...stats,
+      todaySessions: stats.todaySessions + 1,
+      weekSessions: stats.weekSessions + 1,
+      totalMinutes: stats.totalMinutes + duration,
+      currentStreak: stats.currentStreak + 1
+    };
+    localStorage.setItem('adhd-timer-stats', JSON.stringify(newStats));
+
+    // Get existing history
+    const savedHistory = localStorage.getItem('adhd-timer-history');
+    const history = savedHistory ? JSON.parse(savedHistory) : [];
+
+    // Add new session
+    const newSession = {
+      id: Date.now(),
+      type: type,
+      duration: duration,
+      completedAt: new Date().toLocaleString(),
+      date: new Date().toLocaleDateString()
+    };
+
+    const newHistory = [newSession, ...history].slice(0, 20); // Keep last 20
+    localStorage.setItem('adhd-timer-history', JSON.stringify(newHistory));
+
+    // Dispatch custom event to notify Progress component
+    window.dispatchEvent(new Event('sessionCompleted'));
+  };
+
   const toggleTimer = () => {
+    // When starting timer, save the duration
+    if (!isActive) {
+      setSessionDuration(minutes);
+    }
     setIsActive(!isActive);
   };
 
@@ -51,8 +108,10 @@ function Timer() {
     setIsActive(false);
     if (sessionType === 'focus') {
       setMinutes(25);
+      setSessionDuration(25);
     } else {
       setMinutes(5);
+      setSessionDuration(5);
     }
     setSeconds(0);
     setShowCompletion(false);
@@ -63,8 +122,10 @@ function Timer() {
     setIsActive(false);
     if (type === 'focus') {
       setMinutes(25);
+      setSessionDuration(25);
     } else {
       setMinutes(5);
+      setSessionDuration(5);
     }
     setSeconds(0);
     setShowCompletion(false);
@@ -72,7 +133,9 @@ function Timer() {
 
   const adjustTime = (amount) => {
     if (!isActive) {
-      setMinutes(Math.max(1, minutes + amount));
+      const newMinutes = Math.max(1, minutes + amount);
+      setMinutes(newMinutes);
+      setSessionDuration(newMinutes);
     }
   };
 
@@ -80,14 +143,16 @@ function Timer() {
     setShowCompletion(false);
     if (sessionType === 'focus') {
       setMinutes(25);
+      setSessionDuration(25);
     } else {
       setMinutes(5);
+      setSessionDuration(5);
     }
     setSeconds(0);
   };
 
   // Calculate progress percentage
-  const totalSeconds = sessionType === 'focus' ? 25 * 60 : 5 * 60;
+  const totalSeconds = sessionDuration * 60;
   const currentSeconds = minutes * 60 + seconds;
   const progress = ((totalSeconds - currentSeconds) / totalSeconds) * 100;
 
@@ -102,7 +167,7 @@ function Timer() {
                 <div className="completion-icon">🎉</div>
                 <h2 className="completion-title">Amazing Work!</h2>
                 <p className="completion-message">
-                  You crushed that focus session! 💪
+                  You crushed that {sessionDuration} minute focus session! 💪
                 </p>
                 <div className="completion-stats">
                   <div className="stat-badge">
@@ -128,7 +193,7 @@ function Timer() {
                 <div className="completion-icon">✨</div>
                 <h2 className="completion-title">Break Complete!</h2>
                 <p className="completion-message">
-                  Feeling refreshed? Let's get back to it! 💚
+                  {sessionDuration} minutes of rest! Feeling refreshed? 💚
                 </p>
                 <div className="completion-actions">
                   <button onClick={() => switchSessionType('focus')} className="focus-btn">
@@ -161,7 +226,7 @@ function Timer() {
       </div>
 
       {/* Timer Display */}
-      <div className={`timer-display ${minutes === 0 && seconds === 0 ? 'timer-complete' : ''}`}>
+      <div className={`timer-display ${minutes === 0 && seconds === 0 && !isActive ? 'timer-complete' : ''}`}>
         {/* Progress Circle */}
         <div className="progress-ring">
           <svg width="280" height="280">
@@ -195,8 +260,8 @@ function Timer() {
             <div className="session-label">
               {minutes === 0 && seconds === 0 && !isActive
                 ? sessionType === 'focus' 
-                  ? '🎉 Session Complete!' 
-                  : '✨ Break Done!'
+                  ? '🎉 Ready for next!' 
+                  : '✨ Ready for next!'
                 : sessionType === 'focus' 
                 ? 'Stay focused!' 
                 : 'Take a break'}

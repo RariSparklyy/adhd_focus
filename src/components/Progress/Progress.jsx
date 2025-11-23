@@ -11,8 +11,8 @@ function Progress() {
 
   const [sessionHistory, setSessionHistory] = useState([]);
 
-  // Load stats from localStorage on mount
-  useEffect(() => {
+  // Load stats and history from localStorage
+  const loadData = () => {
     const savedStats = localStorage.getItem('adhd-timer-stats');
     if (savedStats) {
       setStats(JSON.parse(savedStats));
@@ -22,33 +22,24 @@ function Progress() {
     if (savedHistory) {
       setSessionHistory(JSON.parse(savedHistory));
     }
-  }, []);
-
-  // Mock function to simulate completing a session
-  // (We'll connect this to the Timer later)
-  const mockAddSession = () => {
-    const newSession = {
-      id: Date.now(),
-      type: 'focus',
-      duration: 25,
-      completedAt: new Date().toLocaleString(),
-      date: new Date().toLocaleDateString()
-    };
-
-    const newHistory = [newSession, ...sessionHistory].slice(0, 10); // Keep last 10
-    setSessionHistory(newHistory);
-    localStorage.setItem('adhd-timer-history', JSON.stringify(newHistory));
-
-    const newStats = {
-      ...stats,
-      todaySessions: stats.todaySessions + 1,
-      weekSessions: stats.weekSessions + 1,
-      totalMinutes: stats.totalMinutes + 25,
-      currentStreak: stats.currentStreak + 1
-    };
-    setStats(newStats);
-    localStorage.setItem('adhd-timer-stats', JSON.stringify(newStats));
   };
+
+  // Load on mount
+  useEffect(() => {
+    loadData();
+
+    // Listen for session completion events from Timer
+    const handleSessionCompleted = () => {
+      loadData();
+    };
+
+    window.addEventListener('sessionCompleted', handleSessionCompleted);
+
+    // Cleanup listener
+    return () => {
+      window.removeEventListener('sessionCompleted', handleSessionCompleted);
+    };
+  }, []);
 
   const resetStats = () => {
     if (window.confirm('Are you sure you want to reset all stats?')) {
@@ -65,6 +56,16 @@ function Progress() {
     }
   };
 
+  // Calculate breakdown of focus vs break sessions
+  const focusSessions = sessionHistory.filter(s => s.type === 'focus').length;
+  const breakSessions = sessionHistory.filter(s => s.type === 'break').length;
+  const totalFocusMinutes = sessionHistory
+    .filter(s => s.type === 'focus')
+    .reduce((sum, s) => sum + s.duration, 0);
+  const totalBreakMinutes = sessionHistory
+    .filter(s => s.type === 'break')
+    .reduce((sum, s) => sum + s.duration, 0);
+
   return (
     <div className="progress-container">
       <div className="progress-header">
@@ -79,7 +80,7 @@ function Progress() {
         <div className="stat-card">
           <div className="stat-icon">🔥</div>
           <div className="stat-value">{stats.currentStreak}</div>
-          <div className="stat-label">Day Streak</div>
+          <div className="stat-label">Session Streak</div>
         </div>
 
         <div className="stat-card">
@@ -101,12 +102,30 @@ function Progress() {
         </div>
       </div>
 
-      {/* Mock Button for Testing */}
-      <div className="test-section">
-        <button onClick={mockAddSession} className="mock-session-btn">
-          ➕ Add Mock Session (for testing)
-        </button>
-      </div>
+      {/* Session Breakdown */}
+      {sessionHistory.length > 0 && (
+        <div className="session-breakdown">
+          <h3>Session Breakdown</h3>
+          <div className="breakdown-grid">
+            <div className="breakdown-card focus-card">
+              <div className="breakdown-icon">🎯</div>
+              <div className="breakdown-stats">
+                <div className="breakdown-value">{focusSessions}</div>
+                <div className="breakdown-label">Focus Sessions</div>
+                <div className="breakdown-time">{totalFocusMinutes} minutes</div>
+              </div>
+            </div>
+            <div className="breakdown-card break-card">
+              <div className="breakdown-icon">☕</div>
+              <div className="breakdown-stats">
+                <div className="breakdown-value">{breakSessions}</div>
+                <div className="breakdown-label">Break Sessions</div>
+                <div className="breakdown-time">{totalBreakMinutes} minutes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Session History */}
       <div className="session-history">
@@ -119,7 +138,7 @@ function Progress() {
         ) : (
           <div className="history-list">
             {sessionHistory.map(session => (
-              <div key={session.id} className="history-item">
+              <div key={session.id} className={`history-item ${session.type}-session`}>
                 <div className="history-icon">
                   {session.type === 'focus' ? '🎯' : '☕'}
                 </div>

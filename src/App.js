@@ -1,7 +1,7 @@
 import './App.css';
 import Timer from './components/Timer/Timer';
 import TaskList from './components/TaskList/TaskList';
-import Progress from './components/Progress/Progress';
+// import Progress from './components/Progress/Progress';
 import DeadlineTracker from './components/Deadline/DeadlineTracker';
 import Reflection from './components/Reflection/Reflection';
 
@@ -23,7 +23,7 @@ function App() {
           <div className="tasklist-column">
             <TaskList />
             <Reflection />
-            <Progress />
+            {/* <Progress /> */}
           </div>
         </main>
       </div>
