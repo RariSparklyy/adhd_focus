@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './TaskList.css';
+import { generateTaskBreakdown, testOllamaConnection } from '../../services/aiService';
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
@@ -7,6 +8,32 @@ function TaskList() {
   const [currentTask, setCurrentTask] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [selectedColor, setSelectedColor] = useState('purple');
+  const [isGeneratingBreakdown, setIsGeneratingBreakdown] = useState(false);
+  const [ollamaStatus, setOllamaStatus] = useState(null);
+
+  // Load tasks from localStorage
+  useEffect(() => {
+    const savedTasks = localStorage.getItem('adhd-tasks');
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+  }, []);
+
+  // Save tasks to localStorage and trigger event
+  useEffect(() => {
+    localStorage.setItem('adhd-tasks', JSON.stringify(tasks));
+    // Trigger event for AI Insights Hub
+    window.dispatchEvent(new Event('taskUpdated'));
+  }, [tasks]);
+
+  // Check Ollama connection
+  useEffect(() => {
+    const checkOllama = async () => {
+      const status = await testOllamaConnection();
+      setOllamaStatus(status);
+    };
+    checkOllama();
+  }, []);
 
   // Add a new task
   const addTask = () => {
@@ -60,9 +87,39 @@ function TaskList() {
     setCurrentTask(task);
   };
 
-  // Get AI breakdown (placeholder for later)
-  const getAIBreakdown = (taskId) => {
-    alert('AI Task Breakdown feature will be added later! 🤖');
+  // Get AI breakdown
+  const getAIBreakdown = async (taskId) => {
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task) return;
+
+    if (!ollamaStatus?.connected) {
+      alert('Ollama is not connected. Please start Ollama to use AI features.');
+      return;
+    }
+
+    setIsGeneratingBreakdown(true);
+
+    try {
+      const result = await generateTaskBreakdown(task.text);
+
+      if (result.success && result.steps.length > 0) {
+        // Update task with AI breakdown
+        const updatedTasks = tasks.map(t =>
+          t.id === taskId ? { ...t, aiBreakdown: result.steps } : t
+        );
+        setTasks(updatedTasks);
+
+        alert(`✅ Task Breakdown Generated!\n\n${result.steps.length} steps created.`);
+      } else {
+        alert('Failed to generate task breakdown. Please try again.');
+      }
+    } catch (error) {
+      console.error('Task breakdown error:', error);
+      alert('An error occurred while generating the breakdown.');
+    } finally {
+      setIsGeneratingBreakdown(false);
+    }
   };
 
   return (
@@ -142,6 +199,21 @@ function TaskList() {
                 <div className="task-content">
                   <div className="task-text">{task.text}</div>
                   <div className="task-meta">{task.createdAt}</div>
+                  
+                  {/* AI Breakdown Display */}
+                  {task.aiBreakdown && task.aiBreakdown.length > 0 && (
+                    <div className="ai-breakdown-section">
+                      <div className="breakdown-header">
+                        <span className="breakdown-icon">🤖</span>
+                        <span className="breakdown-title">AI Breakdown:</span>
+                      </div>
+                      <ol className="breakdown-steps">
+                        {task.aiBreakdown.map((step, index) => (
+                          <li key={index} className="breakdown-step">{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -158,9 +230,10 @@ function TaskList() {
                 <button
                   onClick={() => getAIBreakdown(task.id)}
                   className="action-btn ai-btn"
-                  title="Get AI breakdown (coming soon)"
+                  title="Get AI breakdown"
+                  disabled={isGeneratingBreakdown || !ollamaStatus?.connected}
                 >
-                  🤖 AI
+                  {isGeneratingBreakdown ? '⏳' : '🤖'} AI
                 </button>
                 <button
                   onClick={() => deleteTask(task.id)}

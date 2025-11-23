@@ -1,9 +1,9 @@
 import './App.css';
 import Timer from './components/Timer/Timer';
 import TaskList from './components/TaskList/TaskList';
-// import Progress from './components/Progress/Progress';
 import DeadlineTracker from './components/Deadline/DeadlineTracker';
 import Reflection from './components/Reflection/Reflection';
+import AIInsightsHub from './components/AIInsightsHub/AIInsightsHub';
 
 function App() {
   return (
@@ -14,6 +14,9 @@ function App() {
           <p className="app-subtitle">Your friendly focus companion</p>
         </header>
         
+        {/* AI Insights Hub - Top of the page */}
+        <AIInsightsHub />
+        
         <main className="main-content">
           <div className="timer-column">
             <Timer />
@@ -23,7 +26,6 @@ function App() {
           <div className="tasklist-column">
             <TaskList />
             <Reflection />
-            {/* <Progress /> */}
           </div>
         </main>
       </div>

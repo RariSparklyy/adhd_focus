@@ -10,8 +10,8 @@
 
 .app-header {
   text-align: center;
-  margin-bottom: 40px;
-  padding: 30px 20px;
+  margin-bottom: 30px;
+  padding: 30px 20px 20px;
 }
 
 .app-title {
@@ -34,6 +34,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   align-items: start;
+  margin-top: 30px;
 }
 
 .timer-column {
