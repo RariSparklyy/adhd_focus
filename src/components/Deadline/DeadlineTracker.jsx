@@ -18,9 +18,11 @@ function DeadlineTracker() {
     }
   }, []);
 
-  // Save to localStorage whenever deadlines change
+  // Save to localStorage and trigger event whenever deadlines change
   useEffect(() => {
     localStorage.setItem('adhd-deadlines', JSON.stringify(deadlines));
+    // Trigger event for AI Insights Hub
+    window.dispatchEvent(new Event('deadlineUpdated'));
   }, [deadlines]);
 
   const addDeadline = () => {
@@ -32,7 +34,17 @@ function DeadlineTracker() {
       createdAt: new Date().toISOString()
     };
 
-    setDeadlines([...deadlines, deadline]);
+    const updatedDeadlines = [...deadlines, deadline];
+    setDeadlines(updatedDeadlines);
+    
+    // Trigger event with deadline data for AI Insights Hub
+    window.dispatchEvent(new CustomEvent('deadlineAddedWithData', {
+      detail: {
+        deadline: deadline,
+        allDeadlines: updatedDeadlines
+      }
+    }));
+    
     setNewDeadline({ title: '', dueDate: '', priority: 'medium' });
     setShowAddForm(false);
   };
