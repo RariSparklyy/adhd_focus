@@ -14,11 +14,12 @@ function Timer() {
   useEffect(() => {
     let interval = null;
 
-    if (isActive && (minutes > 0 || seconds > 0)) {
+    if (isActive) {
       interval = setInterval(() => {
         if (seconds === 0) {
           if (minutes === 0) {
             // Timer finished!
+            clearInterval(interval);
             setIsActive(false);
             handleTimerComplete();
           } else {
@@ -38,13 +39,13 @@ function Timer() {
     setCompletionType(sessionType);
     setShowCompletion(true);
     
-    // Save session to localStorage for Progress component
+    // Save session to localStorage for tracking
     saveSessionToHistory(sessionType, sessionDuration);
     
-    // Hide completion message after 4 seconds and reset timer
+    // Auto-reset timer after showing completion
     setTimeout(() => {
       setShowCompletion(false);
-      // Auto-reset to default time for next session
+      // Reset to default time
       if (sessionType === 'focus') {
         setMinutes(25);
         setSessionDuration(25);
@@ -92,7 +93,7 @@ function Timer() {
     const newHistory = [newSession, ...history].slice(0, 20); // Keep last 20
     localStorage.setItem('adhd-timer-history', JSON.stringify(newHistory));
 
-    // Dispatch custom event to notify Progress component
+    // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('sessionCompleted'));
   };
 
@@ -154,7 +155,10 @@ function Timer() {
   // Calculate progress percentage
   const totalSeconds = sessionDuration * 60;
   const currentSeconds = minutes * 60 + seconds;
-  const progress = ((totalSeconds - currentSeconds) / totalSeconds) * 100;
+  const progress = totalSeconds > 0 ? ((totalSeconds - currentSeconds) / totalSeconds) * 100 : 0;
+
+  // Check if timer is at 00:00 but not active (completed state)
+  const isCompleted = minutes === 0 && seconds === 0 && !isActive && !showCompletion;
 
   return (
     <div className="timer-container">
@@ -226,7 +230,7 @@ function Timer() {
       </div>
 
       {/* Timer Display */}
-      <div className={`timer-display ${minutes === 0 && seconds === 0 && !isActive ? 'timer-complete' : ''}`}>
+      <div className={`timer-display ${isCompleted ? 'timer-complete' : ''}`}>
         {/* Progress Circle */}
         <div className="progress-ring">
           <svg width="280" height="280">
@@ -243,7 +247,7 @@ function Timer() {
               cy="140"
               r="130"
               fill="none"
-              stroke={sessionType === 'focus' ? '#9333ea' : '#16a34a'}
+              stroke={isCompleted ? '#10b981' : sessionType === 'focus' ? '#9333ea' : '#16a34a'}
               strokeWidth="12"
               strokeDasharray={`${2 * Math.PI * 130}`}
               strokeDashoffset={`${2 * Math.PI * 130 * (1 - progress / 100)}`}
@@ -254,23 +258,21 @@ function Timer() {
           
           {/* Time Text */}
           <div className="time-display">
-            <div className={`time-text ${minutes === 0 && seconds === 0 && !isActive ? 'time-complete' : ''}`}>
+            <div className={`time-text ${isCompleted ? 'time-complete' : ''}`}>
               {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
             <div className="session-label">
-              {minutes === 0 && seconds === 0 && !isActive
-                ? sessionType === 'focus' 
-                  ? '🎉 Ready for next!' 
-                  : '✨ Ready for next!'
-                : sessionType === 'focus' 
-                ? 'Stay focused!' 
-                : 'Take a break'}
+              {isCompleted
+                ? '✨ Session Complete!'
+                : isActive
+                ? sessionType === 'focus' ? 'Stay focused!' : 'Take a break'
+                : sessionType === 'focus' ? 'Ready to focus?' : 'Ready to rest?'}
             </div>
           </div>
         </div>
 
         {/* Time Adjustment Buttons */}
-        {!isActive && (
+        {!isActive && !isCompleted && (
           <div className="time-adjustments">
             <button onClick={() => adjustTime(-5)} className="adjust-btn">-5 min</button>
             <button onClick={() => adjustTime(-1)} className="adjust-btn">-1 min</button>
@@ -281,25 +283,42 @@ function Timer() {
 
         {/* Control Buttons */}
         <div className="control-buttons">
-          <button
-            onClick={toggleTimer}
-            className={`start-btn ${isActive ? 'pause-btn' : ''} ${sessionType === 'focus' ? 'focus-mode' : 'break-mode'}`}
-          >
-            {isActive ? '⏸️ Pause' : '▶️ Start'}
-          </button>
-          <button onClick={resetTimer} className="reset-btn">
-            🔄 Reset
-          </button>
+          {!isCompleted ? (
+            <>
+              <button
+                onClick={toggleTimer}
+                className={`start-btn ${isActive ? 'pause-btn' : ''} ${sessionType === 'focus' ? 'focus-mode' : 'break-mode'}`}
+              >
+                {isActive ? '⏸️ Pause' : '▶️ Start'}
+              </button>
+              <button onClick={resetTimer} className="reset-btn">
+                🔄 Reset
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={resetTimer}
+                className={`start-btn ${sessionType === 'focus' ? 'focus-mode' : 'break-mode'}`}
+              >
+                ▶️ Start New Session
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Enhanced Motivational Message */}
-      <div className={`motivation-box ${isActive ? 'pulsing' : ''}`}>
+      <div className={`motivation-box ${isActive ? 'pulsing' : ''} ${isCompleted ? 'completed' : ''}`}>
         <div className="motivation-icon">
-          {isActive ? '💪' : '👋'}
+          {isCompleted ? '🎉' : isActive ? '💪' : '👋'}
         </div>
         <p className="motivation-text">
-          {isActive
+          {isCompleted
+            ? sessionType === 'focus'
+              ? 'Great job! Session logged and saved!'
+              : 'Break complete! Ready for more focus?'
+            : isActive
             ? sessionType === 'focus' 
               ? 'Stay focused! You\'re building momentum!' 
               : 'Relax and recharge! You earned this break!'
@@ -310,6 +329,11 @@ function Timer() {
         {isActive && (
           <div className="progress-percentage-display">
             {Math.round(progress)}% Complete
+          </div>
+        )}
+        {isCompleted && (
+          <div className="completed-badge">
+            Session Saved ✓
           </div>
         )}
       </div>

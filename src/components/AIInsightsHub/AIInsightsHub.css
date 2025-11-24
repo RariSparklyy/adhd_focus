@@ -200,6 +200,18 @@
   background: #faf5ff;
 }
 
+/* Reflection Update Styling */
+.update-card.reflection-update {
+  border-left: 4px solid #9333ea;
+}
+
+.reflection-badge {
+  font-size: 1.5rem;
+  padding: 2px 8px;
+  background: #faf5ff;
+  border-radius: 8px;
+}
+
 /* Update Header */
 .update-header {
   display: flex;
@@ -267,6 +279,12 @@
   line-height: 1.7;
   margin: 0;
   white-space: pre-wrap;
+}
+
+/* Bold text in updates */
+.update-content strong {
+  color: #9333ea;
+  font-weight: 700;
 }
 
 /* Loading States */

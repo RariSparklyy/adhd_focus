@@ -51,6 +51,58 @@ function AIInsightsHub() {
     };
   }, [autoGenerate, ollamaStatus]);
 
+  // Generate insights specifically from a reflection
+  const generateReflectionInsight = async (reflectionData, sessionHistory) => {
+    if (!ollamaStatus?.connected) {
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      // Import the function
+      const { generateReflectionInsights } = await import('../../services/aiService');
+      
+      const result = await generateReflectionInsights(reflectionData, sessionHistory);
+
+      if (result.success) {
+        // Create new update
+        const newUpdate = {
+          id: Date.now(),
+          content: result.summary,
+          timestamp: new Date().toLocaleString(),
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString(),
+          type: 'reflection',
+          mood: reflectionData.mood
+        };
+
+        // Add to beginning of array, keep only last 5
+        setUpdates([newUpdate, ...updates].slice(0, 5));
+      }
+    } catch (error) {
+      console.error('Reflection insight error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Listen for reflection events with data
+  useEffect(() => {
+    const handleReflectionAdded = (event) => {
+      if (event.detail && ollamaStatus?.connected) {
+        const { reflection, sessionHistory } = event.detail;
+        generateReflectionInsight(reflection, sessionHistory);
+      }
+    };
+
+    window.addEventListener('reflectionAddedWithData', handleReflectionAdded);
+
+    return () => {
+      window.removeEventListener('reflectionAddedWithData', handleReflectionAdded);
+    };
+  }, [ollamaStatus, updates]);
+
   const generateInsights = async () => {
     if (!ollamaStatus?.connected) {
       alert('Ollama is not connected. Please start Ollama.');
@@ -107,6 +159,24 @@ function AIInsightsHub() {
     }
   };
 
+  // Format bold text from markdown
+  const formatBoldText = (text) => {
+    // Convert **text** to <strong>text</strong>
+    return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  };
+
+  // Get mood emoji
+  const getMoodEmoji = (mood) => {
+    const emojis = {
+      great: '😄',
+      good: '🙂',
+      neutral: '😐',
+      struggling: '😟',
+      tough: '😰'
+    };
+    return emojis[mood] || '😐';
+  };
+
   return (
     <div className="ai-insights-hub">
       <div className="hub-header">
@@ -152,7 +222,7 @@ function AIInsightsHub() {
           <div className="feed-empty">
             <div className="empty-icon">📊</div>
             <h3>No updates yet</h3>
-            <p>Click "New Update" to get AI insights on your productivity</p>
+            <p>Complete a reflection or click "New Update" to get AI insights</p>
           </div>
         )}
 
@@ -170,17 +240,20 @@ function AIInsightsHub() {
         )}
 
         {updates.map((update, index) => (
-          <div key={update.id} className={`update-card ${index === 0 ? 'latest' : ''}`}>
+          <div key={update.id} className={`update-card ${index === 0 ? 'latest' : ''} ${update.type === 'reflection' ? 'reflection-update' : ''}`}>
             <div className="update-header">
-              <span className="update-icon">💡</span>
+              <span className="update-icon">{update.type === 'reflection' ? '📔' : '💡'}</span>
               <div className="update-meta">
                 <span className="update-date">{update.date}</span>
                 <span className="update-time">{update.time}</span>
               </div>
               {index === 0 && <span className="latest-badge">Latest</span>}
+              {update.type === 'reflection' && (
+                <span className="reflection-badge">{getMoodEmoji(update.mood)}</span>
+              )}
             </div>
             <div className="update-body">
-              <p className="update-content">{update.content}</p>
+              <p className="update-content" dangerouslySetInnerHTML={{ __html: formatBoldText(update.content) }}></p>
             </div>
           </div>
         ))}

@@ -122,6 +122,12 @@ function TaskList() {
     }
   };
 
+  // Format bold text from markdown
+  const formatBoldText = (text) => {
+    // Convert **text** to <strong>text</strong>
+    return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  };
+
   return (
     <div className="tasklist-container">
       <div className="tasklist-header">
@@ -209,7 +215,11 @@ function TaskList() {
                       </div>
                       <ol className="breakdown-steps">
                         {task.aiBreakdown.map((step, index) => (
-                          <li key={index} className="breakdown-step">{step}</li>
+                          <li 
+                            key={index} 
+                            className="breakdown-step"
+                            dangerouslySetInnerHTML={{ __html: formatBoldText(step) }}
+                          ></li>
                         ))}
                       </ol>
                     </div>

@@ -98,144 +98,6 @@ export const generatePatternInsights = async (reflections, sessionHistory) => {
 };
 
 /**
- * Prepare context from a single reflection
- */
-const prepareReflectionContext = (reflection, sessionHistory) => {
-  // Get recent sessions (last 10)
-  const recentSessions = sessionHistory.slice(0, 10);
-  const focusSessions = recentSessions.filter(s => s.type === 'focus');
-  const breakSessions = recentSessions.filter(s => s.type === 'break');
-  
-  const totalFocusTime = focusSessions.reduce((sum, s) => sum + s.duration, 0);
-  const averageSessionLength = focusSessions.length > 0 
-    ? (totalFocusTime / focusSessions.length).toFixed(1) 
-    : 0;
-
-  return {
-    mood: reflection.mood,
-    productivity: reflection.productivity,
-    wins: reflection.wins || 'No wins recorded',
-    challenges: reflection.challenges || 'No challenges recorded',
-    notes: reflection.notes || 'No additional notes',
-    sessionCount: recentSessions.length,
-    focusSessionCount: focusSessions.length,
-    breakSessionCount: breakSessions.length,
-    totalFocusTime: totalFocusTime,
-    averageSessionLength: averageSessionLength,
-    date: reflection.date,
-    time: reflection.time
-  };
-};
-
-/**
- * Prepare context from multiple reflections
- */
-const preparePatternContext = (reflections, sessionHistory) => {
-  const recentReflections = reflections.slice(0, 7); // Last 7 reflections
-  
-  const moodCounts = {};
-  let totalProductivity = 0;
-  const allChallenges = [];
-  const allWins = [];
-  
-  recentReflections.forEach(r => {
-    moodCounts[r.mood] = (moodCounts[r.mood] || 0) + 1;
-    totalProductivity += r.productivity;
-    if (r.challenges) allChallenges.push(r.challenges);
-    if (r.wins) allWins.push(r.wins);
-  });
-
-  const avgProductivity = recentReflections.length > 0 
-    ? (totalProductivity / recentReflections.length).toFixed(1) 
-    : 0;
-
-  const focusSessions = sessionHistory.filter(s => s.type === 'focus');
-  const totalFocusTime = focusSessions.reduce((sum, s) => sum + s.duration, 0);
-
-  return {
-    reflectionCount: recentReflections.length,
-    moodCounts: moodCounts,
-    averageProductivity: avgProductivity,
-    totalFocusTime: totalFocusTime,
-    focusSessionCount: focusSessions.length,
-    commonChallenges: allChallenges.slice(0, 5),
-    recentWins: allWins.slice(0, 5)
-  };
-};
-
-/**
- * Create prompt for single reflection analysis
- */
-const createReflectionPrompt = (context) => {
-  return `You are a supportive AI assistant helping ADHD students with productivity and mental wellness. 
-
-Analyze this reflection and provide encouraging, personalized insights:
-
-**Date:** ${context.date} at ${context.time}
-**Mood:** ${context.mood}
-**Productivity Level:** ${context.productivity}/10
-
-**What went well:**
-${context.wins}
-
-**Challenges faced:**
-${context.challenges}
-
-**Additional notes:**
-${context.notes}
-
-**Recent Activity:**
-- Completed ${context.focusSessionCount} focus sessions (${context.totalFocusTime} minutes total)
-- Average session length: ${context.averageSessionLength} minutes
-- Completed ${context.breakSessionCount} break sessions
-
-Provide a warm, encouraging summary (3-4 sentences) that:
-1. Acknowledges their mood and productivity level
-2. Celebrates their wins (even small ones!)
-3. Offers practical, ADHD-friendly advice for their challenges
-4. Encourages continued progress
-
-Keep it personal, supportive, and actionable. Focus on progress, not perfection.`;
-};
-
-/**
- * Create prompt for pattern analysis
- */
-const createPatternPrompt = (context) => {
-  const moodSummary = Object.entries(context.moodCounts)
-    .map(([mood, count]) => `${mood}: ${count} times`)
-    .join(', ');
-
-  return `You are a supportive AI assistant helping ADHD students understand their productivity patterns.
-
-Analyze these patterns from the last ${context.reflectionCount} reflections:
-
-**Mood Distribution:**
-${moodSummary}
-
-**Average Productivity:** ${context.averageProductivity}/10
-
-**Focus Activity:**
-- Total focus sessions: ${context.focusSessionCount}
-- Total focus time: ${context.totalFocusTime} minutes
-
-**Common Challenges:**
-${context.commonChallenges.join('\n')}
-
-**Recent Wins:**
-${context.recentWins.join('\n')}
-
-Provide insightful analysis (4-5 sentences) that:
-1. Identifies positive patterns and trends
-2. Highlights recurring challenges with empathy
-3. Suggests ADHD-friendly strategies to improve
-4. Celebrates growth and progress
-5. Offers specific, actionable next steps
-
-Be encouraging, practical, and ADHD-aware. Focus on sustainable habits and self-compassion.`;
-};
-
-/**
  * Generate AI task breakdown
  */
 export const generateTaskBreakdown = async (taskText) => {
@@ -329,33 +191,154 @@ export const generateComprehensiveInsights = async (allData) => {
 };
 
 /**
+ * Prepare context from a single reflection
+ */
+const prepareReflectionContext = (reflection, sessionHistory) => {
+  // Get recent sessions (last 10)
+  const recentSessions = sessionHistory.slice(0, 10);
+  const focusSessions = recentSessions.filter(s => s.type === 'focus');
+  const breakSessions = recentSessions.filter(s => s.type === 'break');
+  
+  const totalFocusTime = focusSessions.reduce((sum, s) => sum + s.duration, 0);
+  const averageSessionLength = focusSessions.length > 0 
+    ? (totalFocusTime / focusSessions.length).toFixed(1) 
+    : 0;
+
+  return {
+    mood: reflection.mood,
+    productivity: reflection.productivity,
+    wins: reflection.wins || 'No wins recorded',
+    challenges: reflection.challenges || 'No challenges recorded',
+    notes: reflection.notes || 'No additional notes',
+    sessionCount: recentSessions.length,
+    focusSessionCount: focusSessions.length,
+    breakSessionCount: breakSessions.length,
+    totalFocusTime: totalFocusTime,
+    averageSessionLength: averageSessionLength,
+    date: reflection.date,
+    time: reflection.time
+  };
+};
+
+/**
+ * Prepare context from multiple reflections
+ */
+const preparePatternContext = (reflections, sessionHistory) => {
+  const recentReflections = reflections.slice(0, 7); // Last 7 reflections
+  
+  const moodCounts = {};
+  let totalProductivity = 0;
+  const allChallenges = [];
+  const allWins = [];
+  
+  recentReflections.forEach(r => {
+    moodCounts[r.mood] = (moodCounts[r.mood] || 0) + 1;
+    totalProductivity += r.productivity;
+    if (r.challenges) allChallenges.push(r.challenges);
+    if (r.wins) allWins.push(r.wins);
+  });
+
+  const avgProductivity = recentReflections.length > 0 
+    ? (totalProductivity / recentReflections.length).toFixed(1) 
+    : 0;
+
+  const focusSessions = sessionHistory.filter(s => s.type === 'focus');
+  const totalFocusTime = focusSessions.reduce((sum, s) => sum + s.duration, 0);
+
+  return {
+    reflectionCount: recentReflections.length,
+    moodCounts: moodCounts,
+    averageProductivity: avgProductivity,
+    totalFocusTime: totalFocusTime,
+    focusSessionCount: focusSessions.length,
+    commonChallenges: allChallenges.slice(0, 5),
+    recentWins: allWins.slice(0, 5)
+  };
+};
+
+/**
+ * Create prompt for single reflection analysis
+ */
+const createReflectionPrompt = (context) => {
+  return `You are a supportive AI assistant helping ADHD students with productivity and mental wellness. 
+
+Analyze this reflection and provide a brief, encouraging insight:
+
+**Mood:** ${context.mood}
+**Productivity:** ${context.productivity}/10
+**Wins:** ${context.wins}
+**Challenges:** ${context.challenges}
+**Notes:** ${context.notes}
+**Recent Activity:** ${context.focusSessionCount} focus sessions (${context.totalFocusTime} min)
+
+Provide a short insight (2-3 sentences) that:
+1. Acknowledges their mood/productivity
+2. Celebrates a specific win
+3. Offers ONE practical tip for their challenges
+
+Format: Use **double asterisks** around key phrases for emphasis (e.g., **great progress**, **try this**).
+
+Keep it warm, specific, and actionable.`;
+};
+
+/**
+ * Create prompt for pattern analysis
+ */
+const createPatternPrompt = (context) => {
+  const moodSummary = Object.entries(context.moodCounts)
+    .map(([mood, count]) => `${mood}: ${count} times`)
+    .join(', ');
+
+  return `You are a supportive AI assistant helping ADHD students understand their productivity patterns.
+
+Analyze these patterns from the last ${context.reflectionCount} reflections:
+
+**Mood Distribution:**
+${moodSummary}
+
+**Average Productivity:** ${context.averageProductivity}/10
+
+**Focus Activity:**
+- Total focus sessions: ${context.focusSessionCount}
+- Total focus time: ${context.totalFocusTime} minutes
+
+**Common Challenges:**
+${context.commonChallenges.join('\n')}
+
+**Recent Wins:**
+${context.recentWins.join('\n')}
+
+Provide insightful analysis (4-5 sentences) that:
+1. Identifies positive patterns and trends
+2. Highlights recurring challenges with empathy
+3. Suggests ADHD-friendly strategies to improve
+4. Celebrates growth and progress
+5. Offers specific, actionable next steps
+
+Be encouraging, practical, and ADHD-aware. Focus on sustainable habits and self-compassion.`;
+};
+
+/**
  * Create prompt for task breakdown
  */
 const createTaskBreakdownPrompt = (taskText) => {
-  return `You are an ADHD-focused productivity assistant. Break down this task into small, manageable steps that are easy to start and complete.
+  return `You are an ADHD-focused productivity assistant. Break down this task into 3-4 small, specific steps.
 
 Task: "${taskText}"
 
-Provide 3-6 concrete, actionable steps. Each step should:
-- Be specific and clear
-- Take 5-15 minutes to complete
+Each step should:
+- Be 5-10 words max
 - Start with an action verb
-- Be achievable in one focused session
+- Take 5-15 minutes
+- Be immediately actionable
 
-Format your response as a numbered list (1., 2., 3., etc.) with each step on a new line.
+Use **double asterisks** around action verbs for emphasis (e.g., **Open** the document).
 
-Example format:
-1. Open the document and read the first section
-2. Create an outline with 3 main points
-3. Write the introduction paragraph
-4. Draft the first main point
+Format as a numbered list (1., 2., 3., etc.).
 
 Now break down the task:`;
 };
 
-/**
- * Create prompt for comprehensive insights
- */
 /**
  * Create prompt for comprehensive insights
  */
@@ -376,9 +359,10 @@ Provide a short update (2-3 sentences) that:
 2. Gives ONE practical tip or encouragement
 3. Stays positive and ADHD-friendly
 
+Use **double asterisks** around key phrases for emphasis.
+
 Keep it brief, specific, and actionable. No generic advice.`;
 };
-
 
 /**
  * Prepare comprehensive context from all app data
@@ -474,12 +458,11 @@ const parseTaskSteps = (response) => {
   
   // If no structured format found, return lines as steps
   if (steps.length === 0) {
-    return lines.slice(0, 6); // Max 6 steps
+    return lines.slice(0, 4); // Max 4 steps
   }
   
-  return steps.slice(0, 6); // Max 6 steps
+  return steps.slice(0, 4); // Max 4 steps
 };
-
 
 /**
  * Test Ollama connection

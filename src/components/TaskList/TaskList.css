@@ -313,6 +313,12 @@
   margin-bottom: 0;
 }
 
+/* Bold text in breakdown steps */
+.breakdown-step strong {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
 /* Task Actions */
 .task-actions {
   display: flex;
