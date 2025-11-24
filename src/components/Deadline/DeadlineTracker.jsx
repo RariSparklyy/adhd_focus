@@ -81,19 +81,19 @@ function DeadlineTracker() {
       overdue: '#ef4444',
       critical: '#f59e0b',
       urgent: '#f97316',
-      soon: '#3b82f6',
+      soon: '#06b6d4',
       normal: '#10b981'
     };
     return colors[urgency] || colors.normal;
   };
 
   const getStartSuggestion = (days) => {
-    if (days < 0) return "⚠️ Overdue! Take action now";
-    if (days === 0) return "🚨 Due TODAY! Start immediately";
-    if (days === 1) return "⏰ Due tomorrow! Work on this today";
-    if (days <= 3) return `🎯 Start with 25 minutes today`;
-    if (days <= 7) return `📅 ${days} days left - Break into small chunks`;
-    return `✅ ${days} days left - Plan your approach`;
+    if (days < 0) return "Overdue! Take action now";
+    if (days === 0) return "Due TODAY! Start immediately";
+    if (days === 1) return "Due tomorrow! Work on this today";
+    if (days <= 3) return `Start with 25 minutes today`;
+    if (days <= 7) return `${days} days left - Break into small chunks`;
+    return `${days} days left - Plan your approach`;
   };
 
   // Sort by urgency
@@ -106,12 +106,22 @@ function DeadlineTracker() {
   return (
     <div className="deadline-tracker">
       <div className="deadline-header">
-        <h2>⏰ Deadline Radar</h2>
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          Deadline Tracker
+        </h2>
         <button 
           onClick={() => setShowAddForm(!showAddForm)}
           className="add-deadline-btn"
         >
-          {showAddForm ? '✕ Cancel' : '➕ Add Deadline'}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          {showAddForm ? 'Cancel' : 'Add Deadline'}
         </button>
       </div>
 
@@ -141,7 +151,12 @@ function DeadlineTracker() {
             <option value="high">High Priority</option>
           </select>
           <button onClick={addDeadline} className="save-deadline-btn">
-            💾 Save Deadline
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H16L21 8V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Save Deadline
           </button>
         </div>
       )}
@@ -150,7 +165,12 @@ function DeadlineTracker() {
       <div className="deadlines-list">
         {sortedDeadlines.length === 0 ? (
           <div className="empty-deadlines">
-            <div className="empty-icon">📅</div>
+            <svg className="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+              <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M3 10H21" stroke="currentColor" strokeWidth="2"/>
+            </svg>
             <p>No deadlines yet!</p>
             <p className="empty-subtext">Add one to stay on track</p>
           </div>
@@ -175,7 +195,7 @@ function DeadlineTracker() {
                         cy="30"
                         r="26"
                         fill="none"
-                        stroke="#e5e7eb"
+                        stroke="#334155"
                         strokeWidth="4"
                       />
                       <circle
@@ -200,6 +220,12 @@ function DeadlineTracker() {
                   <div className="deadline-info">
                     <div className="deadline-title">{deadline.title}</div>
                     <div className="deadline-date">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M3 10H21" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
                       Due: {new Date(deadline.dueDate).toLocaleDateString('en-US', { 
                         month: 'short', 
                         day: 'numeric',
@@ -213,9 +239,24 @@ function DeadlineTracker() {
 
                   {/* Priority Badge */}
                   <div className={`priority-badge priority-${deadline.priority}`}>
-                    {deadline.priority === 'high' && '🔥'}
-                    {deadline.priority === 'medium' && '⚡'}
-                    {deadline.priority === 'low' && '📌'}
+                    {deadline.priority === 'high' && (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                    {deadline.priority === 'medium' && (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                      </svg>
+                    )}
+                    {deadline.priority === 'low' && (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    )}
                   </div>
                 </div>
 
@@ -235,7 +276,10 @@ function DeadlineTracker() {
                   onClick={() => deleteDeadline(deadline.id)}
                   className="delete-deadline-btn"
                 >
-                  ✓ Done
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Done
                 </button>
               </div>
             );

@@ -92,26 +92,22 @@ function Reflection() {
     }
   };
 
-  const getMoodEmoji = (mood) => {
-    const emojis = {
-      great: '😄',
-      good: '🙂',
-      neutral: '😐',
-      struggling: '😟',
-      tough: '😰'
-    };
-    return emojis[mood] || '😐';
+  const clearSessionHistory = () => {
+    if (window.confirm('Clear all session history? This cannot be undone.')) {
+      localStorage.removeItem('adhd-timer-history');
+      setSessionHistory([]);
+    }
   };
 
   const getMoodColor = (mood) => {
     const colors = {
       great: '#10b981',
-      good: '#3b82f6',
-      neutral: '#6b7280',
+      good: '#06b6d4',
+      neutral: '#94a3b8',
       struggling: '#f59e0b',
       tough: '#ef4444'
     };
-    return colors[mood] || '#6b7280';
+    return colors[mood] || '#94a3b8';
   };
 
   // Calculate session breakdown
@@ -125,14 +121,26 @@ function Reflection() {
     <div className="reflection-container">
       <div className="reflection-header">
         <div className="header-content">
-          <h2>📔 Reflections & Session History</h2>
-          <p className="header-subtitle">Track your journey - AI insights appear in the hub above</p>
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" strokeWidth="2"/>
+              <path d="M9 9H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M9 13H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M9 17H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            Reflections & Session History
+          </h2>
+          <p className="header-subtitle">Track your journey - Milky learns from your progress</p>
         </div>
         <button 
           onClick={() => setShowAddForm(!showAddForm)}
           className="add-reflection-btn"
         >
-          {showAddForm ? '✕ Cancel' : '➕ New Reflection'}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          {showAddForm ? 'Cancel' : 'New Reflection'}
         </button>
       </div>
 
@@ -146,18 +154,21 @@ function Reflection() {
             <label className="form-label">How are you feeling?</label>
             <div className="mood-selector">
               {[
-                { value: 'great', label: 'Great', emoji: '😄' },
-                { value: 'good', label: 'Good', emoji: '🙂' },
-                { value: 'neutral', label: 'Okay', emoji: '😐' },
-                { value: 'struggling', label: 'Struggling', emoji: '😟' },
-                { value: 'tough', label: 'Tough', emoji: '😰' }
+                { value: 'great', label: 'Great' },
+                { value: 'good', label: 'Good' },
+                { value: 'neutral', label: 'Okay' },
+                { value: 'struggling', label: 'Struggling' },
+                { value: 'tough', label: 'Tough' }
               ].map(mood => (
                 <button
                   key={mood.value}
                   onClick={() => setNewReflection({...newReflection, mood: mood.value})}
                   className={`mood-btn ${newReflection.mood === mood.value ? 'selected' : ''}`}
+                  style={{ 
+                    borderColor: newReflection.mood === mood.value ? getMoodColor(mood.value) : '#334155',
+                    backgroundColor: newReflection.mood === mood.value ? `${getMoodColor(mood.value)}20` : 'transparent'
+                  }}
                 >
-                  <span className="mood-emoji">{mood.emoji}</span>
                   <span className="mood-label">{mood.label}</span>
                 </button>
               ))}
@@ -186,7 +197,12 @@ function Reflection() {
 
           {/* Wins */}
           <div className="form-section">
-            <label className="form-label">🎉 What went well?</label>
+            <label className="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              What went well?
+            </label>
             <textarea
               placeholder="Celebrate your wins, big or small!"
               value={newReflection.wins}
@@ -198,7 +214,14 @@ function Reflection() {
 
           {/* Challenges */}
           <div className="form-section">
-            <label className="form-label">💪 What was challenging?</label>
+            <label className="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="12" cy="16" r="1" fill="currentColor"/>
+              </svg>
+              What was challenging?
+            </label>
             <textarea
               placeholder="It's okay to struggle. What made things difficult?"
               value={newReflection.challenges}
@@ -210,7 +233,15 @@ function Reflection() {
 
           {/* Notes */}
           <div className="form-section">
-            <label className="form-label">📝 Additional notes</label>
+            <label className="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              Additional notes
+            </label>
             <textarea
               placeholder="Any other thoughts or observations?"
               value={newReflection.notes}
@@ -221,7 +252,12 @@ function Reflection() {
           </div>
 
           <button onClick={addReflection} className="save-reflection-btn">
-            💾 Save Reflection
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H16L21 8V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Save Reflection
           </button>
         </div>
       )}
@@ -229,25 +265,56 @@ function Reflection() {
       {/* Session Overview Stats */}
       {sessionHistory.length > 0 && (
         <div className="session-overview">
-          <h3>📊 Session Overview</h3>
+          <div className="overview-header">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+              Session Overview
+            </h3>
+            <button onClick={clearSessionHistory} className="clear-sessions-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Clear History
+            </button>
+          </div>
           <div className="overview-grid">
             <div className="overview-card">
-              <div className="overview-icon">🔥</div>
+              <svg className="overview-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
               <div className="overview-value">{stats.currentStreak}</div>
               <div className="overview-label">Streak</div>
             </div>
             <div className="overview-card">
-              <div className="overview-icon">🎯</div>
+              <svg className="overview-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
               <div className="overview-value">{focusSessions}</div>
               <div className="overview-label">Focus Sessions</div>
             </div>
             <div className="overview-card">
-              <div className="overview-icon">☕</div>
+              <svg className="overview-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.59 13.41L17 17L13.41 13.41C12.84 12.84 12 13.25 12 14.08V19C12 19.55 12.45 20 13 20H21C21.55 20 22 19.55 22 19V14.08C22 13.25 21.16 12.84 20.59 13.41Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" stroke="currentColor" strokeWidth="2"/>
+              </svg>
               <div className="overview-value">{breakSessions}</div>
               <div className="overview-label">Break Sessions</div>
             </div>
             <div className="overview-card">
-              <div className="overview-icon">⏱️</div>
+              <svg className="overview-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 6V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
               <div className="overview-value">{totalFocusMinutes}</div>
               <div className="overview-label">Focus Minutes</div>
             </div>
@@ -257,10 +324,21 @@ function Reflection() {
 
       {/* Recent Sessions History */}
       <div className="session-history-section">
-        <h3>📝 Recent Sessions</h3>
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Recent Sessions
+        </h3>
         {sessionHistory.length === 0 ? (
           <div className="empty-sessions">
-            <div className="empty-icon">📭</div>
+            <svg className="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+              <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M3 10H21" stroke="currentColor" strokeWidth="2"/>
+            </svg>
             <p>No sessions yet!</p>
             <p className="empty-subtext">Complete a focus or break session to see it here</p>
           </div>
@@ -269,7 +347,17 @@ function Reflection() {
             {sessionHistory.slice(0, 15).map(session => (
               <div key={session.id} className={`session-item ${session.type}-session`}>
                 <div className="session-icon-circle">
-                  {session.type === 'focus' ? '🎯' : '☕'}
+                  {session.type === 'focus' ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20.59 13.41L17 17L13.41 13.41C12.84 12.84 12 13.25 12 14.08V19C12 19.55 12.45 20 13 20H21C21.55 20 22 19.55 22 19V14.08C22 13.25 21.16 12.84 20.59 13.41Z" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  )}
                 </div>
                 <div className="session-details">
                   <div className="session-type">
@@ -282,7 +370,9 @@ function Reflection() {
                   </div>
                 </div>
                 <div className="session-badge">
-                  ✓
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
               </div>
             ))}
@@ -292,10 +382,18 @@ function Reflection() {
 
       {/* Reflections List */}
       <div className="reflections-section">
-        <h3>💭 Your Reflections</h3>
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Your Reflections
+        </h3>
         {reflections.length === 0 ? (
           <div className="empty-reflections">
-            <div className="empty-icon">📔</div>
+            <svg className="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2"/>
+              <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2"/>
+            </svg>
             <p>No reflections yet!</p>
             <p className="empty-subtext">Add a reflection to track your progress and mindset</p>
           </div>
@@ -313,19 +411,25 @@ function Reflection() {
                     className="reflection-mood-badge"
                     style={{ backgroundColor: getMoodColor(reflection.mood) }}
                   >
-                    {getMoodEmoji(reflection.mood)}
+                    {reflection.mood}
                   </div>
                 </div>
 
                 {/* Session Context */}
                 <div className="reflection-context">
-                  <span className="context-item">
-                    📊 {reflection.sessionsAtTime} sessions completed
-                  </span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                  <span className="context-item">{reflection.sessionsAtTime} sessions completed</span>
                   <span className="context-dot">•</span>
-                  <span className="context-item">
-                    ⏱️ {reflection.totalMinutesAtTime} total minutes
-                  </span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  <span className="context-item">{reflection.totalMinutesAtTime} total minutes</span>
                 </div>
 
                 {/* Productivity Bar */}
@@ -347,7 +451,9 @@ function Reflection() {
                 {reflection.wins && (
                   <div className="reflection-section wins-section">
                     <div className="section-header">
-                      <span className="section-icon">🎉</span>
+                      <svg className="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                       <span className="section-title">Wins</span>
                     </div>
                     <p className="section-content">{reflection.wins}</p>
@@ -357,7 +463,11 @@ function Reflection() {
                 {reflection.challenges && (
                   <div className="reflection-section challenges-section">
                     <div className="section-header">
-                      <span className="section-icon">💪</span>
+                      <svg className="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                      </svg>
                       <span className="section-title">Challenges</span>
                     </div>
                     <p className="section-content">{reflection.challenges}</p>
@@ -367,7 +477,10 @@ function Reflection() {
                 {reflection.notes && (
                   <div className="reflection-section notes-section">
                     <div className="section-header">
-                      <span className="section-icon">📝</span>
+                      <svg className="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
                       <span className="section-title">Notes</span>
                     </div>
                     <p className="section-content">{reflection.notes}</p>
@@ -380,7 +493,11 @@ function Reflection() {
                     onClick={() => deleteReflection(reflection.id)}
                     className="action-btn-danger"
                   >
-                    🗑️ Delete
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Delete
                   </button>
                 </div>
               </div>

@@ -20,11 +20,11 @@
 }
 
 .completion-overlay.focus-complete {
-  background: rgba(147, 51, 234, 0.95);
+  background: rgba(139, 92, 246, 0.95);
 }
 
 .completion-overlay.break-complete {
-  background: rgba(22, 163, 74, 0.95);
+  background: rgba(16, 185, 129, 0.95);
 }
 
 @keyframes overlayFadeIn {
@@ -37,13 +37,14 @@
 }
 
 .completion-content {
-  background: white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   padding: 50px 40px;
   border-radius: 24px;
   text-align: center;
   max-width: 500px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   animation: contentPopIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 2px solid #475569;
 }
 
 @keyframes contentPopIn {
@@ -58,7 +59,7 @@
 }
 
 .completion-icon {
-  font-size: 6rem;
+  color: #10b981;
   margin-bottom: 20px;
   animation: iconBounce 0.8s ease infinite;
 }
@@ -77,14 +78,14 @@
 
 .completion-title {
   font-size: 2.5rem;
-  color: #1f2937;
+  color: #e2e8f0;
   margin-bottom: 15px;
   font-weight: 800;
 }
 
 .completion-message {
   font-size: 1.2rem;
-  color: #6b7280;
+  color: #94a3b8;
   margin-bottom: 30px;
 }
 
@@ -96,22 +97,22 @@
 }
 
 .stat-badge {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  background: #0f172a;
   padding: 15px 25px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 2px solid #e9d5ff;
+  border: 2px solid #334155;
 }
 
-.badge-icon {
-  font-size: 1.5rem;
+.stat-badge svg {
+  color: #8b5cf6;
 }
 
 .badge-text {
   font-weight: 700;
-  color: #7c3aed;
+  color: #a78bfa;
   font-size: 1.1rem;
 }
 
@@ -130,39 +131,44 @@
   font-size: 1.1rem;
   font-weight: 700;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .continue-btn {
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  background: #8b5cf6;
   color: white;
-  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .continue-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
 }
 
 .break-btn,
 .extend-btn {
-  background: #f3f4f6;
-  color: #374151;
+  background: #334155;
+  color: #e2e8f0;
+  border: 2px solid #475569;
 }
 
 .break-btn:hover,
 .extend-btn:hover {
-  background: #e5e7eb;
+  background: #475569;
 }
 
 .focus-btn {
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  background: #8b5cf6;
   color: white;
-  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .focus-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
 }
 
 /* Session Selector */
@@ -176,51 +182,60 @@
   flex: 1;
   padding: 15px 20px;
   border-radius: 12px;
-  background: white;
-  color: #6b7280;
+  background: #1e293b;
+  color: #94a3b8;
   font-size: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .session-btn:hover {
-  background: #f9fafb;
+  background: #334155;
+  border-color: #475569;
 }
 
 .session-btn.active-focus {
-  background: #9333ea;
+  background: #8b5cf6;
   color: white;
-  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .session-btn.active-break {
-  background: #16a34a;
+  background: #10b981;
   color: white;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 /* Timer Display */
 .timer-display {
-  background: white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 24px;
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   margin-bottom: 20px;
   transition: all 0.5s ease;
+  border: 2px solid #475569;
 }
 
 .timer-display.timer-complete {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
   border: 2px solid #10b981;
   animation: successPulse 1.5s ease infinite;
 }
 
 @keyframes successPulse {
   0%, 100% {
-    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 15px 50px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 15px 50px rgba(16, 185, 129, 0.6);
     transform: scale(1.02);
   }
 }
@@ -253,7 +268,7 @@
 .time-text {
   font-size: 4rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #e2e8f0;
   line-height: 1;
   transition: all 0.3s ease;
 }
@@ -277,7 +292,7 @@
 
 .session-label {
   font-size: 0.9rem;
-  color: #9ca3af;
+  color: #94a3b8;
   margin-top: 10px;
   transition: all 0.3s ease;
 }
@@ -292,14 +307,16 @@
 
 .adjust-btn {
   padding: 10px 20px;
-  background: #f3f4f6;
-  color: #374151;
+  background: #0f172a;
+  color: #cbd5e1;
   border-radius: 10px;
   font-size: 14px;
+  border: 2px solid #334155;
 }
 
 .adjust-btn:hover {
-  background: #e5e7eb;
+  background: #1e293b;
+  border-color: #475569;
 }
 
 /* Control Buttons */
@@ -315,21 +332,25 @@
   color: white;
   font-size: 18px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .start-btn.focus-mode {
-  background: #9333ea;
-  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+  background: #8b5cf6;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 .start-btn.break-mode {
-  background: #16a34a;
-  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+  background: #10b981;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .start-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.5);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
 }
 
 .pause-btn {
@@ -339,50 +360,59 @@
 
 .reset-btn {
   padding: 18px 30px;
-  background: #e5e7eb;
-  color: #374151;
+  background: #334155;
+  color: #e2e8f0;
   border-radius: 14px;
   font-size: 18px;
+  border: 2px solid #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .reset-btn:hover {
-  background: #d1d5db;
+  background: #475569;
 }
 
 /* Enhanced Motivation Box */
 .motivation-box {
-  background: white;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 16px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border: 2px solid #e5e7eb;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid #475569;
   transition: all 0.3s ease;
 }
 
 .motivation-box.pulsing {
   animation: pulse 2s infinite;
-  border-color: #9333ea;
+  border-color: #8b5cf6;
 }
 
 .motivation-box.completed {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
   border-color: #10b981;
 }
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   }
   50% {
-    box-shadow: 0 4px 25px rgba(147, 51, 234, 0.4);
+    box-shadow: 0 4px 25px rgba(139, 92, 246, 0.5);
   }
 }
 
 .motivation-icon {
-  font-size: 2.5rem;
+  color: #8b5cf6;
   margin-bottom: 10px;
   animation: float 3s ease-in-out infinite;
+}
+
+.motivation-box.completed .motivation-icon {
+  color: #10b981;
 }
 
 @keyframes float {
@@ -395,7 +425,7 @@
 }
 
 .motivation-text {
-  color: #6b7280;
+  color: #94a3b8;
   font-size: 16px;
   margin: 0 0 10px 0;
   font-weight: 500;
@@ -403,7 +433,7 @@
 
 .progress-percentage-display {
   display: inline-block;
-  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  background: #8b5cf6;
   color: white;
   padding: 8px 20px;
   border-radius: 20px;
@@ -413,7 +443,9 @@
 }
 
 .completed-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #10b981;
   color: white;
   padding: 8px 20px;
@@ -424,7 +456,7 @@
 }
 
 /* Responsive */
-@keyframes (max-width: 768px) {
+@media (max-width: 768px) {
   .completion-content {
     padding: 40px 30px;
     margin: 20px;
@@ -435,7 +467,8 @@
   }
   
   .completion-icon {
-    font-size: 4rem;
+    width: 64px;
+    height: 64px;
   }
   
   .completion-stats {

@@ -168,43 +168,70 @@ function Timer() {
           <div className="completion-content">
             {completionType === 'focus' ? (
               <>
-                <div className="completion-icon">🎉</div>
+                <svg className="completion-icon" width="96" height="96" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 <h2 className="completion-title">Amazing Work!</h2>
                 <p className="completion-message">
-                  You crushed that {sessionDuration} minute focus session! 💪
+                  You crushed that {sessionDuration} minute focus session!
                 </p>
                 <div className="completion-stats">
                   <div className="stat-badge">
-                    <span className="badge-icon">⭐</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
                     <span className="badge-text">+1 Session</span>
                   </div>
                   <div className="stat-badge">
-                    <span className="badge-icon">🔥</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
                     <span className="badge-text">Streak!</span>
                   </div>
                 </div>
                 <div className="completion-actions">
                   <button onClick={continueWorking} className="continue-btn">
-                    🚀 Keep the momentum!
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    Keep the momentum!
                   </button>
                   <button onClick={() => switchSessionType('break')} className="break-btn">
-                    ☕ Take a break
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20.59 13.41L17 17L13.41 13.41C12.84 12.84 12 13.25 12 14.08V19C12 19.55 12.45 20 13 20H21C21.55 20 22 19.55 22 19V14.08C22 13.25 21.16 12.84 20.59 13.41Z" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                    Take a break
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <div className="completion-icon">✨</div>
+                <svg className="completion-icon" width="96" height="96" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
                 <h2 className="completion-title">Break Complete!</h2>
                 <p className="completion-message">
-                  {sessionDuration} minutes of rest! Feeling refreshed? 💚
+                  {sessionDuration} minutes of rest! Feeling refreshed?
                 </p>
                 <div className="completion-actions">
                   <button onClick={() => switchSessionType('focus')} className="focus-btn">
-                    🎯 Start Focus Session
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                    </svg>
+                    Start Focus Session
                   </button>
                   <button onClick={continueWorking} className="extend-btn">
-                    😌 Extend break
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    Extend break
                   </button>
                 </div>
               </>
@@ -219,13 +246,21 @@ function Timer() {
           onClick={() => switchSessionType('focus')}
           className={`session-btn ${sessionType === 'focus' ? 'active-focus' : ''}`}
         >
-          🎯 Focus Time
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+          Focus Time
         </button>
         <button
           onClick={() => switchSessionType('break')}
           className={`session-btn ${sessionType === 'break' ? 'active-break' : ''}`}
         >
-          ☕ Break Time
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.59 13.41L17 17L13.41 13.41C12.84 12.84 12 13.25 12 14.08V19C12 19.55 12.45 20 13 20H21C21.55 20 22 19.55 22 19V14.08C22 13.25 21.16 12.84 20.59 13.41Z" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+          Break Time
         </button>
       </div>
 
@@ -239,7 +274,7 @@ function Timer() {
               cy="140"
               r="130"
               fill="none"
-              stroke="#e5e7eb"
+              stroke="#334155"
               strokeWidth="12"
             />
             <circle
@@ -247,7 +282,7 @@ function Timer() {
               cy="140"
               r="130"
               fill="none"
-              stroke={isCompleted ? '#10b981' : sessionType === 'focus' ? '#9333ea' : '#16a34a'}
+              stroke={isCompleted ? '#10b981' : sessionType === 'focus' ? '#8b5cf6' : '#10b981'}
               strokeWidth="12"
               strokeDasharray={`${2 * Math.PI * 130}`}
               strokeDashoffset={`${2 * Math.PI * 130 * (1 - progress / 100)}`}
@@ -263,7 +298,7 @@ function Timer() {
             </div>
             <div className="session-label">
               {isCompleted
-                ? '✨ Session Complete!'
+                ? 'Session Complete!'
                 : isActive
                 ? sessionType === 'focus' ? 'Stay focused!' : 'Take a break'
                 : sessionType === 'focus' ? 'Ready to focus?' : 'Ready to rest?'}
@@ -289,10 +324,29 @@ function Timer() {
                 onClick={toggleTimer}
                 className={`start-btn ${isActive ? 'pause-btn' : ''} ${sessionType === 'focus' ? 'focus-mode' : 'break-mode'}`}
               >
-                {isActive ? '⏸️ Pause' : '▶️ Start'}
+                {isActive ? (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="6" y="4" width="4" height="16" fill="currentColor"/>
+                      <rect x="14" y="4" width="4" height="16" fill="currentColor"/>
+                    </svg>
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 3L19 12L5 21V3Z" fill="currentColor"/>
+                    </svg>
+                    Start
+                  </>
+                )}
               </button>
               <button onClick={resetTimer} className="reset-btn">
-                🔄 Reset
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 4V10H7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3.51 15C4.01717 16.4332 4.87913 17.7146 6.01547 18.7246C7.1518 19.7345 8.52547 20.4402 10.0083 20.7757C11.4911 21.1112 13.0348 21.0657 14.4952 20.6432C15.9556 20.2208 17.2853 19.4353 18.36 18.36C19.4347 17.2853 20.2208 15.9556 20.6432 14.4952C21.0657 13.0348 21.1112 11.4911 20.7757 10.0083C20.4402 8.52547 19.7345 7.1518 18.7246 6.01547C17.7146 4.87913 16.4332 4.01717 15 3.51" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Reset
               </button>
             </>
           ) : (
@@ -301,7 +355,10 @@ function Timer() {
                 onClick={resetTimer}
                 className={`start-btn ${sessionType === 'focus' ? 'focus-mode' : 'break-mode'}`}
               >
-                ▶️ Start New Session
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 3L19 12L5 21V3Z" fill="currentColor"/>
+                </svg>
+                Start New Session
               </button>
             </>
           )}
@@ -310,9 +367,18 @@ function Timer() {
 
       {/* Enhanced Motivational Message */}
       <div className={`motivation-box ${isActive ? 'pulsing' : ''} ${isCompleted ? 'completed' : ''}`}>
-        <div className="motivation-icon">
-          {isCompleted ? '🎉' : isActive ? '💪' : '👋'}
-        </div>
+        <svg className="motivation-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {isCompleted ? (
+            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          ) : isActive ? (
+            <>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </>
+          ) : (
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2"/>
+          )}
+        </svg>
         <p className="motivation-text">
           {isCompleted
             ? sessionType === 'focus'
@@ -333,7 +399,10 @@ function Timer() {
         )}
         {isCompleted && (
           <div className="completed-badge">
-            Session Saved ✓
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Session Saved
           </div>
         )}
       </div>

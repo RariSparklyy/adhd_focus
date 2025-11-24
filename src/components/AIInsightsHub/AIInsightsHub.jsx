@@ -324,8 +324,8 @@ function AIInsightsHub() {
     <div className="ai-insights-hub">
       <div className="hub-header">
         <div className="hub-title-section">
-          <h2>🤖 AI Insights Hub</h2>
-          <p className="hub-subtitle">Your productivity update log with deadline tracking</p>
+          <h2> MILKY AI </h2>
+          <p className="hub-subtitle">Your compassionate AI assistant</p>
         </div>
         <div className="hub-controls">
           <label className="auto-generate-toggle">
