@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import './AIInsightsHub.css';
 import { generateComprehensiveInsights, generateDeadlineReminders, testOllamaConnection } from '../../services/aiService';
 
+// Importing professional icons
+import { 
+  FiCpu, FiRefreshCw, FiTrash2, FiBarChart2, FiClock, 
+  FiCalendar, FiCheckSquare, FiBook, FiActivity, FiAlertOctagon, 
+  FiAlertTriangle, FiBell, FiZap, FiSmile, FiMeh, FiFrown, 
+  FiThumbsUp, FiThermometer, FiArrowUp, FiArrowDown, FiMinus,
+  FiFileText, FiLoader
+} from 'react-icons/fi';
+
 function AIInsightsHub() {
   const [updates, setUpdates] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -286,45 +295,49 @@ function AIInsightsHub() {
     return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   };
 
-  // Get mood emoji
-  const getMoodEmoji = (mood) => {
-    const emojis = {
-      great: '😄',
-      good: '🙂',
-      neutral: '😐',
-      struggling: '😟',
-      tough: '😰'
-    };
-    return emojis[mood] || '😐';
+  // Get mood icon
+  const getMoodIcon = (mood) => {
+    const iconProps = { size: 16, className: "mood-icon" };
+    switch (mood) {
+      case 'great': return <FiSmile {...iconProps} />;
+      case 'good': return <FiThumbsUp {...iconProps} />;
+      case 'neutral': return <FiMeh {...iconProps} />;
+      case 'struggling': return <FiFrown {...iconProps} />;
+      case 'tough': return <FiThermometer {...iconProps} />; // Represents "fever/tough"
+      default: return <FiMeh {...iconProps} />;
+    }
   };
 
-  // Get priority emoji
-  const getPriorityEmoji = (priority) => {
-    const emojis = {
-      high: '🔥',
-      medium: '⚡',
-      low: '📌'
-    };
-    return emojis[priority] || '📌';
+  // Get priority icon
+  const getPriorityIcon = (priority) => {
+    const iconProps = { size: 14, className: "priority-icon" };
+    switch (priority) {
+      case 'high': return <FiArrowUp {...iconProps} color="#ef4444" />;
+      case 'medium': return <FiMinus {...iconProps} color="#f59e0b" />;
+      case 'low': return <FiArrowDown {...iconProps} color="#10b981" />;
+      default: return <FiMinus {...iconProps} />;
+    }
   };
 
   // Get update type icon
   const getUpdateIcon = (update) => {
-    if (update.type === 'reflection') return '📔';
-    if (update.type === 'deadline') return '⏰';
+    const iconProps = { size: 20 };
+    if (update.type === 'reflection') return <FiBook {...iconProps} />;
+    if (update.type === 'deadline') return <FiClock {...iconProps} />;
     if (update.type === 'deadline-reminder') {
-      if (update.urgencyLevel === 'overdue') return '🚨';
-      if (update.urgencyLevel === 'urgent') return '⚠️';
-      return '📅';
+      if (update.urgencyLevel === 'overdue') return <FiAlertOctagon {...iconProps} />;
+      if (update.urgencyLevel === 'urgent') return <FiAlertTriangle {...iconProps} />;
+      return <FiBell {...iconProps} />;
     }
-    return '💡';
+    // Comprehensive/Default
+    return <FiZap {...iconProps} />;
   };
 
   return (
     <div className="ai-insights-hub">
       <div className="hub-header">
         <div className="hub-title-section">
-          <h2> MILKY AI </h2>
+          <h2><FiCpu className="title-icon" /> MILKY AI </h2>
           <p className="hub-subtitle">Your compassionate AI assistant</p>
         </div>
         <div className="hub-controls">
@@ -341,7 +354,11 @@ function AIInsightsHub() {
             className="generate-hub-btn"
             disabled={isGenerating || !ollamaStatus?.connected}
           >
-            {isGenerating ? '⏳ Analyzing...' : '🔄 New Update'}
+            {isGenerating ? (
+              <><FiLoader className="spin" /> Analyzing...</>
+            ) : (
+              <><FiRefreshCw /> New Update</>
+            )}
           </button>
         </div>
       </div>
@@ -354,7 +371,7 @@ function AIInsightsHub() {
         </div>
         {updates.length > 0 && (
           <button onClick={clearUpdates} className="clear-btn">
-            🗑️ Clear All
+            <FiTrash2 /> Clear All
           </button>
         )}
       </div>
@@ -363,7 +380,7 @@ function AIInsightsHub() {
       <div className="updates-feed">
         {updates.length === 0 && !isGenerating && (
           <div className="feed-empty">
-            <div className="empty-icon">📊</div>
+            <div className="empty-icon"><FiBarChart2 size={48} strokeWidth={1} /></div>
             <h3>No updates yet</h3>
             <p>Complete a reflection, add a deadline, or click "New Update" to get AI insights</p>
           </div>
@@ -388,17 +405,19 @@ function AIInsightsHub() {
             className={`update-card ${index === 0 ? 'latest' : ''} ${update.type}-update ${update.urgencyLevel ? `urgency-${update.urgencyLevel}` : ''}`}
           >
             <div className="update-header">
-              <span className="update-icon">{getUpdateIcon(update)}</span>
+              <span className="update-icon-wrapper">
+                {getUpdateIcon(update)}
+              </span>
               <div className="update-meta">
                 <span className="update-date">{update.date}</span>
                 <span className="update-time">{update.time}</span>
               </div>
               {index === 0 && <span className="latest-badge">Latest</span>}
               {update.type === 'reflection' && (
-                <span className="reflection-badge">{getMoodEmoji(update.mood)}</span>
+                <span className="reflection-badge">{getMoodIcon(update.mood)}</span>
               )}
               {update.type === 'deadline' && (
-                <span className="priority-badge">{getPriorityEmoji(update.priority)}</span>
+                <span className="priority-badge">{getPriorityIcon(update.priority)}</span>
               )}
               {update.type === 'deadline-reminder' && update.urgencyLevel === 'overdue' && (
                 <span className="urgency-badge overdue-badge">Overdue</span>
@@ -409,7 +428,7 @@ function AIInsightsHub() {
             </div>
             {update.deadlineTitle && (
               <div className="update-subtitle">
-                📝 {update.deadlineTitle}
+                <FiFileText className="subtitle-icon" /> {update.deadlineTitle}
               </div>
             )}
             <div className="update-body">
@@ -423,10 +442,10 @@ function AIInsightsHub() {
       <div className="hub-footer">
         <span className="footer-label">Data sources:</span>
         <div className="sources-tags">
-          <span className="source-tag">⏱️ Sessions</span>
-          <span className="source-tag">📝 Tasks</span>
-          <span className="source-tag">⏰ Deadlines</span>
-          <span className="source-tag">📔 Reflections</span>
+          <span className="source-tag"><FiClock className="tag-icon"/> Sessions</span>
+          <span className="source-tag"><FiCheckSquare className="tag-icon"/> Tasks</span>
+          <span className="source-tag"><FiCalendar className="tag-icon"/> Deadlines</span>
+          <span className="source-tag"><FiBook className="tag-icon"/> Reflections</span>
         </div>
       </div>
     </div>

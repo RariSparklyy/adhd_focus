@@ -10,8 +10,8 @@ function App() {
     <div className="App">
       <div className="app-container">
         <header className="app-header">
-          <h1 className="app-title">🧠 ADHD Study Timer</h1>
-          <p className="app-subtitle">Your friendly focus companion</p>
+          <h1 className="app-title">🧠 ADHD Focus Bunny</h1>
+          <p className="app-subtitle">Your friendly neighborhood ADHD companion</p>
         </header>
         
         {/* AI Insights Hub - Top of the page */}
