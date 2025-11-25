@@ -93,11 +93,24 @@ function Reflection() {
   };
 
   const clearSessionHistory = () => {
-    if (window.confirm('Clear all session history? This cannot be undone.')) {
-      localStorage.removeItem('adhd-timer-history');
-      setSessionHistory([]);
-    }
-  };
+    if (window.confirm('Clear all session history? This cannot be undone.')) {
+      // 1. Clear LocalStorage for both history AND stats
+      localStorage.removeItem('adhd-timer-history');
+      localStorage.removeItem('adhd-timer-stats'); // <--- Added this line
+
+      // 2. Reset local state
+      setSessionHistory([]);
+      setStats({ // <--- Added this block to reset streak/time/counts
+        todaySessions: 0,
+        weekSessions: 0,
+        totalMinutes: 0,
+        currentStreak: 0
+      });
+
+      // 3. Dispatch a custom event so the Timer component knows to update immediately
+      window.dispatchEvent(new CustomEvent('historyCleared'));
+    }
+  };
 
   const getMoodColor = (mood) => {
     const colors = {
