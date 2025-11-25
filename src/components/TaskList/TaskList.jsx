@@ -57,8 +57,16 @@ function TaskList() {
     
     // Sort tasks by quadrant priority (Q1 > Q2 > Q3 > Q4) locally for display if desired, 
     // or just append. Here we append to top.
+    const updatedTasks = [task, ...tasks];
     setTasks([task, ...tasks]);
     setNewTask('');
+
+    window.dispatchEvent(new CustomEvent('taskAddedWithData', {
+      detail: {
+        task: task,
+        allTasks: updatedTasks
+      }
+    }));
   };
 
   const handleKeyPress = (e) => {

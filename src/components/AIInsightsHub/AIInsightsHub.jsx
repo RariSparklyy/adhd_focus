@@ -8,7 +8,7 @@ import {
   FiCalendar, FiCheckSquare, FiBook, FiActivity, FiAlertOctagon, 
   FiAlertTriangle, FiBell, FiZap, FiSmile, FiMeh, FiFrown, 
   FiThumbsUp, FiThermometer, FiArrowUp, FiArrowDown, FiMinus,
-  FiFileText, FiLoader
+  FiFileText, FiLoader, FiTarget
 } from 'react-icons/fi';
 
 function AIInsightsHub() {
@@ -120,7 +120,7 @@ function AIInsightsHub() {
     }
   };
 
-  // Listen for data updates from other components
+  // Listen for generic data updates from other components
   useEffect(() => {
     const handleDataUpdate = () => {
       if (autoGenerate && ollamaStatus?.connected) {
@@ -129,13 +129,63 @@ function AIInsightsHub() {
     };
 
     window.addEventListener('sessionCompleted', handleDataUpdate);
-    window.addEventListener('taskUpdated', handleDataUpdate);
+    window.addEventListener('taskUpdated', handleDataUpdate); // Keeps listening for completions
 
     return () => {
       window.removeEventListener('sessionCompleted', handleDataUpdate);
       window.removeEventListener('taskUpdated', handleDataUpdate);
     };
   }, [autoGenerate, ollamaStatus]);
+
+  // ---------------------------------------------------------
+  //  NEW: Listen for Task Added Events with Context
+  // ---------------------------------------------------------
+  useEffect(() => {
+    const handleTaskAdded = async (event) => {
+      if (event.detail && ollamaStatus?.connected) {
+        const { task, allTasks } = event.detail;
+        await generateTaskInsight(task, allTasks);
+      }
+    };
+
+    window.addEventListener('taskAddedWithData', handleTaskAdded);
+
+    return () => {
+      window.removeEventListener('taskAddedWithData', handleTaskAdded);
+    };
+  }, [ollamaStatus, updates]);
+
+  // Generate insights specifically from a new task
+  const generateTaskInsight = async (task, allTasks) => {
+    if (!ollamaStatus?.connected) return;
+    setIsGenerating(true);
+
+    try {
+      // Dynamic import to avoid circular dependencies or loading unused services
+      const { generateTaskInsights } = await import('../../services/aiService');
+      
+      const result = await generateTaskInsights(task, allTasks);
+
+      if (result.success) {
+        const newUpdate = {
+          id: Date.now(),
+          content: result.insights,
+          timestamp: new Date().toLocaleString(),
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString(),
+          type: 'task',
+          taskText: task.text,
+          quadrant: task.quadrant
+        };
+
+        setUpdates([newUpdate, ...updates].slice(0, 10));
+      }
+    } catch (error) {
+      console.error('Task insight error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Listen for deadline events with data
   useEffect(() => {
@@ -155,10 +205,7 @@ function AIInsightsHub() {
 
   // Generate insights specifically from a deadline
   const generateDeadlineInsight = async (deadline, allDeadlines) => {
-    if (!ollamaStatus?.connected) {
-      return;
-    }
-
+    if (!ollamaStatus?.connected) return;
     setIsGenerating(true);
 
     try {
@@ -189,10 +236,7 @@ function AIInsightsHub() {
 
   // Generate insights specifically from a reflection
   const generateReflectionInsight = async (reflectionData, sessionHistory) => {
-    if (!ollamaStatus?.connected) {
-      return;
-    }
-
+    if (!ollamaStatus?.connected) return;
     setIsGenerating(true);
 
     try {
@@ -303,7 +347,7 @@ function AIInsightsHub() {
       case 'good': return <FiThumbsUp {...iconProps} />;
       case 'neutral': return <FiMeh {...iconProps} />;
       case 'struggling': return <FiFrown {...iconProps} />;
-      case 'tough': return <FiThermometer {...iconProps} />; // Represents "fever/tough"
+      case 'tough': return <FiThermometer {...iconProps} />;
       default: return <FiMeh {...iconProps} />;
     }
   };
@@ -319,11 +363,23 @@ function AIInsightsHub() {
     }
   };
 
+  // Get Quadrant Label for Tasks
+  const getQuadrantLabel = (quadrant) => {
+    switch (quadrant) {
+      case 'q1': return <span className="quadrant-tag q1-tag">Q1: Do First</span>;
+      case 'q2': return <span className="quadrant-tag q2-tag">Q2: Schedule</span>;
+      case 'q3': return <span className="quadrant-tag q3-tag">Q3: Delegate</span>;
+      case 'q4': return <span className="quadrant-tag q4-tag">Q4: Eliminate</span>;
+      default: return <span className="quadrant-tag">Task</span>;
+    }
+  };
+
   // Get update type icon
   const getUpdateIcon = (update) => {
     const iconProps = { size: 20 };
     if (update.type === 'reflection') return <FiBook {...iconProps} />;
-    if (update.type === 'deadline') return <FiClock {...iconProps} />;
+    if (update.type === 'deadline') return <FiCalendar {...iconProps} />;
+    if (update.type === 'task') return <FiCheckSquare {...iconProps} />; // New Task Icon
     if (update.type === 'deadline-reminder') {
       if (update.urgencyLevel === 'overdue') return <FiAlertOctagon {...iconProps} />;
       if (update.urgencyLevel === 'urgent') return <FiAlertTriangle {...iconProps} />;
@@ -382,7 +438,7 @@ function AIInsightsHub() {
           <div className="feed-empty">
             <div className="empty-icon"><FiBarChart2 size={48} strokeWidth={1} /></div>
             <h3>No updates yet</h3>
-            <p>Complete a reflection, add a deadline, or click "New Update" to get AI insights</p>
+            <p>Add a task, reflection, or deadline to get AI insights</p>
           </div>
         )}
 
@@ -394,7 +450,7 @@ function AIInsightsHub() {
             </div>
             <div className="update-body">
               <div className="loading-spinner-small"></div>
-              <p>Analyzing your productivity data...</p>
+              <p>Milky is analyzing your data...</p>
             </div>
           </div>
         )}
@@ -413,11 +469,16 @@ function AIInsightsHub() {
                 <span className="update-time">{update.time}</span>
               </div>
               {index === 0 && <span className="latest-badge">Latest</span>}
+              
+              {/* Badges for different types */}
               {update.type === 'reflection' && (
                 <span className="reflection-badge">{getMoodIcon(update.mood)}</span>
               )}
               {update.type === 'deadline' && (
                 <span className="priority-badge">{getPriorityIcon(update.priority)}</span>
+              )}
+              {update.type === 'task' && update.quadrant && (
+                getQuadrantLabel(update.quadrant)
               )}
               {update.type === 'deadline-reminder' && update.urgencyLevel === 'overdue' && (
                 <span className="urgency-badge overdue-badge">Overdue</span>
@@ -426,11 +487,19 @@ function AIInsightsHub() {
                 <span className="urgency-badge urgent-badge">Urgent</span>
               )}
             </div>
+            
+            {/* Subtitles for context */}
             {update.deadlineTitle && (
               <div className="update-subtitle">
-                <FiFileText className="subtitle-icon" /> {update.deadlineTitle}
+                <FiClock className="subtitle-icon" /> {update.deadlineTitle}
               </div>
             )}
+            {update.taskText && (
+              <div className="update-subtitle">
+                <FiTarget className="subtitle-icon" /> {update.taskText}
+              </div>
+            )}
+
             <div className="update-body">
               <p className="update-content" dangerouslySetInnerHTML={{ __html: formatBoldText(update.content) }}></p>
             </div>
