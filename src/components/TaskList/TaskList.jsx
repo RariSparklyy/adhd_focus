@@ -161,7 +161,6 @@ function TaskList() {
             
             
 
-[Image of Eisenhower Decision Matrix]
 
 
             <div className="matrix-grid-visual">
@@ -169,25 +168,25 @@ function TaskList() {
                 <span className="q-tag">Q1</span>
                 <h4>DO FIRST</h4>
                 <p>Urgent & Important</p>
-                <small>Crises, Deadlines, Problems</small>
+                <small>Tasks that require immediate attention, such as crises or pressing deadlines.</small>
               </div>
               <div className="matrix-quadrant q2-visual">
                 <span className="q-tag">Q2</span>
                 <h4>SCHEDULE</h4>
                 <p>Not Urgent & Important</p>
-                <small>Planning, Health, Growth</small>
+                <small>Activities focused on long-term goals, planning, and personal growth.</small>
               </div>
               <div className="matrix-quadrant q3-visual">
                 <span className="q-tag">Q3</span>
                 <h4>DELEGATE</h4>
                 <p>Urgent & Not Important</p>
-                <small>Interruptions, Some Emails</small>
+                <small>Distractions and interruptions that need to be minimized, like unnecessary meetings.</small>
               </div>
               <div className="matrix-quadrant q4-visual">
                 <span className="q-tag">Q4</span>
                 <h4>ELIMINATE</h4>
                 <p>Not Urgent & Not Important</p>
-                <small>Time Wasters, Busy Work</small>
+                <small>Time-passing activities that should be lower in the priority, these are perfect for break sessions!</small>
               </div>
             </div>
           </div>
