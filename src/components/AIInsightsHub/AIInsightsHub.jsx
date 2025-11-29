@@ -97,6 +97,43 @@ function AIInsightsHub() {
     };
   }, [ollamaStatus]);
 
+  // Listen for deadline COMPLETION events
+  useEffect(() => {
+    const handleDeadlineCompleted = async (event) => {
+      if (event.detail && ollamaStatus?.connected) {
+        const { deadline } = event.detail;
+        
+        // Trigger generic AI generation, or a specific "Celebration" insight
+        // For now, we reuse generateTaskInsight logic or create a specific one
+        setIsGenerating(true);
+        try {
+            // We can send a specific prompt for deadline completion
+            const completionUpdate = {
+                id: Date.now(),
+                content: `<strong>Deadline Crushed!</strong> Great job completing "${deadline.title}"! Keeping up with deadlines builds incredible momentum.`,
+                timestamp: new Date().toLocaleString(),
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                type: 'deadline', // We re-use deadline type or make a new 'celebration' type
+                deadlineTitle: deadline.title,
+                priority: deadline.priority
+            };
+            setUpdates(prev => [completionUpdate, ...prev].slice(0, 10));
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsGenerating(false);
+        }
+      }
+    };
+
+    window.addEventListener('deadlineCompletedWithData', handleDeadlineCompleted);
+
+    return () => {
+      window.removeEventListener('deadlineCompletedWithData', handleDeadlineCompleted);
+    };
+  }, [ollamaStatus]);
+
   // Generate deadline reminder update
   const generateDeadlineReminderUpdate = async (deadlines) => {
     try {

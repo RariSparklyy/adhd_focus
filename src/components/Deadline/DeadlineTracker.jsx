@@ -21,7 +21,7 @@ function DeadlineTracker() {
   // Save to localStorage and trigger event whenever deadlines change
   useEffect(() => {
     localStorage.setItem('adhd-deadlines', JSON.stringify(deadlines));
-    // Trigger event for AI Insights Hub
+    // Trigger event for AI Insights Hub (General update)
     window.dispatchEvent(new Event('deadlineUpdated'));
   }, [deadlines]);
 
@@ -49,9 +49,26 @@ function DeadlineTracker() {
     setShowAddForm(false);
   };
 
+  // --- MODIFIED FUNCTION ---
   const deleteDeadline = (id) => {
-    setDeadlines(deadlines.filter(d => d.id !== id));
+    // 1. Find the deadline before we delete it so we can send it to AI
+    const completedDeadline = deadlines.find(d => d.id === id);
+
+    // 2. Filter it out of the list
+    const updatedDeadlines = deadlines.filter(d => d.id !== id);
+    setDeadlines(updatedDeadlines);
+
+    // 3. Dispatch event specifically for COMPLETION
+    if (completedDeadline) {
+      window.dispatchEvent(new CustomEvent('deadlineCompletedWithData', {
+        detail: {
+          deadline: completedDeadline,
+          remainingDeadlines: updatedDeadlines
+        }
+      }));
+    }
   };
+  // -------------------------
 
   const calculateTimeLeft = (dueDate) => {
     const now = new Date();
