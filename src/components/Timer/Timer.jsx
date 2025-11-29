@@ -84,7 +84,7 @@ function Timer() {
     // Add new session
     const newSession = {
       id: Date.now(),
-      type: type,
+      type: type, // This is 'focus' or 'break'
       duration: duration,
       completedAt: new Date().toLocaleString(),
       date: new Date().toLocaleDateString()
@@ -93,8 +93,15 @@ function Timer() {
     const newHistory = [newSession, ...history].slice(0, 20); // Keep last 20
     localStorage.setItem('adhd-timer-history', JSON.stringify(newHistory));
 
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new Event('sessionCompleted'));
+    // --- CHANGED THIS BLOCK ---
+    // Dispatch custom event with DETAILS so AI knows the type
+    window.dispatchEvent(new CustomEvent('sessionCompleted', {
+      detail: {
+        session: newSession,
+        stats: newStats
+      }
+    }));
+    // --------------------------
   };
 
   const toggleTimer = () => {
