@@ -475,3 +475,25 @@
     flex-direction: column;
   }
 }
+
+.top-right-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #94a3b8; /* Slate-400 */
+  transition: 0.2s ease;
+}
+
+.top-right-btn:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Make sure timer-container is positioned */
+.timer-container {
+  position: relative;
+}
